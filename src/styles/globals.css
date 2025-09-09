@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+
+:root {
+  /* Colores principales */
+  --color-primary: #0054c4;
+  --color-secondary: #34699A;
+  --color-third: #58A0C8;
+  --color-fourth: #FDF5AA;
+  --color-holder: #869196;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-red: #c40003;
+  --color-red-dark: #730002;
+
+
+  /* Tipografía */
+  --font-family-base: "Nunito", sans-serif;
+  --font-size-base: 16px;
+  --font-weight-medium: 500;
+}
+* {
+  font-family: var(--font-family-base);
+}
+
+body {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--font-size-base);
+}
+
+button{
+    background-color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+    color: var(--color-white);
+    border-radius: 16px;
+    cursor: pointer;
+    padding: 6px 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease, border 50s ease;
+}
+button:hover { 
+    background-color: var(--color-secondary); 
+    transform: scale(1.05);
+    border: 2px solid var(--color-black);
+}
