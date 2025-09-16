@@ -1,0 +1,116 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-white);
+  border: none;
+  backdrop-filter: saturate(140%) blur(6px);
+}
+
+.row {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  color: var(--color-black);
+}
+
+.desktopNav {
+  display: none;
+  gap: 10px;
+}
+
+.link {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--color-black);
+  border: none;
+  outline: none;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.active {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-secondary), transparent 85%) inset;
+}
+
+.link:hover:not(.active),
+.link:focus-visible:not(.active) {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  outline: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.toggle {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.bar {
+  width: 18px;
+  height: 2px;
+  background: var(--color-black);
+  transition: transform .2s ease, opacity .2s ease, background-color .2s ease;
+}
+
+.open .bar:nth-child(1) { transform: translateY(4px) rotate(45deg); }
+.open .bar:nth-child(2) { opacity: 0; }
+.open .bar:nth-child(3) { transform: translateY(-4px) rotate(-45deg); }
+
+.mobileNav {
+  background: var(--color-white);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .25s ease;
+}
+
+.mobileNavOpen {
+  max-height: 240px;
+}
+
+.mobileLink {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--color-black);
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.mobileLink.active {
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.mobileLink:hover:not(.active),
+.mobileLink:focus-visible:not(.active) {
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+
+@media (min-width: 768px) {
+  .desktopNav { display: flex; }
+  .toggle { display: none; }
+  .mobileNav { display: none; }
+}
