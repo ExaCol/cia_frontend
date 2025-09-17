@@ -9,7 +9,8 @@ const nav = [
   { href: "/", label: "Inicio" },
   { href: "/SIMIT", label: "SIMIT" },
   { href: "/Oficinas-de-tramites", label: "Oficinas de trámites" },
-  { href: "/perfil", label: "perfil" },
+  { href: "/perfil", label: "Perfil" },
+  { href: "/pruebas", label: "Pruebas" },
 ];
 
 export default function Header() {
