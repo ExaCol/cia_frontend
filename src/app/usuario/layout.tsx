@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export const viewport = { width: 'device-width', initialScale: 1 };
 
@@ -17,8 +17,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="layout">
+        <Header />
         <main className="content">{children}</main>
-        <Footer />
       </body>
     </html>
   );

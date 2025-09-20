@@ -1,3 +1,9 @@
+/* 
+  Developed by Tomás Vera & Luis Romero
+  Version 1.1
+  Global Styles
+*/
+
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
 
 :root {
@@ -36,10 +42,31 @@ button{
     border-radius: 16px;
     cursor: pointer;
     padding: 6px 16px;
+    margin: 10px;
     transition: background-color 0.3s ease, transform 0.2s ease, border 50s ease;
 }
 button:hover { 
     background-color: var(--color-secondary); 
     transform: scale(1.05);
     border: 2px solid var(--color-black);
+}
+
+input, select, textarea {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    padding: 8px;
+    border: 1px solid var(--color-holder);
+    border-radius: 16px;
+    box-sizing: border-box;
+    resize: vertical;
+    margin: 2px;
+    background-color: transparent;
+    align-items: center;
+    transition: transform 0.2s ease, border 50s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border: 1px solid var(--color-primary);
+    outline: none;
+    transform: scale(1.02);
 }
