@@ -52,8 +52,10 @@ export default function LoginForm() {
       const message = body?.message ?? "Login exitoso";
 
       alert(`${message}\nUsuario: ${emailFromCookie}${roleFromCookie ? `\nRole: ${roleFromCookie}` : ""}`);
+      if(roleFromCookie === "admin") router.push("/admin");
+      else if(roleFromCookie === "worker") router.push("/worker");
+      else router.push("/client");
 
-      router.push("/");
     } catch (err: any) {
       console.error("Login error:", err);
       alert("Error al conectar con el servidor.");
