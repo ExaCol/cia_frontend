@@ -1,24 +1,67 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.0
+Version 1.1
 Login Form
 */
 
 "use client";
-import React from 'react'
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { readAuthCookie } from "@/app/lib/client/cookies";
 
-function LoginForm() {
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+export default function LoginForm() {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const fd = new FormData(e.currentTarget);
-    const mail = String(fd.get("user") || "").trim();
-    const password = String(fd.get("pass") || "");
+    try {
+      const fd = new FormData(e.currentTarget);
+      const email = String(fd.get("user") || "").trim();
+      const password = String(fd.get("pass") || "");
 
-    const payload = { mail, password };
-    console.log("Payload listo para axios:", payload);
+      if (!email || !password) {
+        alert("Ingresa email y contraseña.");
+        return;
+      }
+
+      const resp = await fetch("/api/auth/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const body = await resp.json().catch(() => ({} as any));
+
+      if (!resp.ok) {
+        const msg = body?.message || `Error de autenticación (${resp.status})`;
+        if(resp.status === 401) {
+          alert("Credenciales inválidas. Intenta de nuevo.");
+          return;
+        }
+        alert(msg);
+        return;
+      }
+
+      const auth = typeof window !== "undefined" ? readAuthCookie() : null;
+
+      const emailFromCookie = auth?.email ?? body?.email ?? email;
+      const roleFromCookie = auth?.role ?? body?.role ?? null;
+      const message = body?.message ?? "Login exitoso";
+
+      alert(`${message}\nUsuario: ${emailFromCookie}${roleFromCookie ? `\nRole: ${roleFromCookie}` : ""}`);
+
+      router.push("/");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      alert("Error al conectar con el servidor.");
+    } finally {
+    }
   };
+
+
   return (
     <form
         onSubmit={handleSubmit}
@@ -58,5 +101,3 @@ function LoginForm() {
       </form>
   )
 }
-
-export default LoginForm

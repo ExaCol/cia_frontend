@@ -12,7 +12,11 @@ import { useRouter } from "next/navigation";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
-function RegisterForm({role}) {
+interface RegisterFormProps {
+  role: string;
+}
+
+function RegisterForm({ role }: RegisterFormProps) {
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
