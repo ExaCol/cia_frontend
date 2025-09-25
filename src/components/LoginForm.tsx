@@ -38,7 +38,7 @@ export default function LoginForm() {
       }
     } catch (err: any) {
       console.error("Login error:", err);
-      alert("Error al conectar con el servidor.");
+      alert("Error de inicio de sesión: " + (err.response?.data?.message || err.message || "Unknown error"));
     }
   };
 

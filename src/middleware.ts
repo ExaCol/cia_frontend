@@ -3,21 +3,23 @@ Developed by Tomás Vera & Luis Romero
 Version 1.1
 Middleware
 */
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify, JWTPayload } from "jose";
 
-const PUBLIC_ROUTES = new Set<string>([
-  "/", 
-  "/login",
-  "/register",
-]);
+const PUBLIC_PATHS = new Set<string>(["/", "/login", "/register"]);
 
 const ROLE_PREFIX: Record<string, string> = {
-  Cliente: "/cliente",
-  Administrador: "/administrador",
-  Empleado: "/empleado",
+  Worker: "/worker",
+  Admin: "/admin",
+  Client: "/client",
 };
+
+function normalize(p: string) {
+  if (p.length > 1 && p.endsWith("/")) return p.slice(0, -1);
+  return p;
+}
 
 async function verifyJwt(token: string): Promise<JWTPayload | null> {
   try {
@@ -31,41 +33,50 @@ async function verifyJwt(token: string): Promise<JWTPayload | null> {
 }
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const pathname = normalize(req.nextUrl.pathname);
 
-  const PUBLIC_FILE = /\.(.*)$/;
-  if (PUBLIC_FILE.test(pathname)) return NextResponse.next();
+  if (/\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|woff2?|ttf|eot)$/.test(pathname)) {
+    return NextResponse.next();
+  }
 
   const token = req.cookies.get("loginToken")?.value;
-  const isPublic = PUBLIC_ROUTES.has(pathname);
+  const isPublic = PUBLIC_PATHS.has(pathname);
 
   if (!token) {
-    if (isPublic) return NextResponse.next();
-
-    const url = new URL("/", req.url);
-    return NextResponse.redirect(url);
+    if (!isPublic) {
+      const to = "/";
+      if (pathname !== to) return NextResponse.redirect(new URL(to, req.url));
+    }
+    return NextResponse.next();
   }
 
   const payload = await verifyJwt(token);
   if (!payload) {
-    const url = new URL("/login", req.url);
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
+    const to = "/login";
+    if (pathname !== to) {
+      const url = new URL(to, req.url);
+      url.searchParams.set("next", pathname);
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
   const role = String(payload.role ?? "");
   const roleHome = ROLE_PREFIX[role];
 
   if (!roleHome) {
-    const url = new URL("/login", req.url);
-    return NextResponse.redirect(url);
+    const to = "/login";
+    if (pathname !== to) return NextResponse.redirect(new URL(to, req.url));
+    return NextResponse.next();
   }
 
   if (isPublic) {
-    return NextResponse.redirect(new URL(roleHome, req.url));
+    if (pathname !== roleHome) return NextResponse.redirect(new URL(roleHome, req.url));
+    return NextResponse.next();
   }
 
-  if (!pathname.startsWith(roleHome)) {
+  const inArea = pathname === roleHome || pathname.startsWith(roleHome + "/");
+  if (!inArea) {
     return NextResponse.redirect(new URL(roleHome, req.url));
   }
 
@@ -74,6 +85,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|images|assets|.*\\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|woff|woff2|ttf|eot)).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|assets).*)",
   ],
 };
+

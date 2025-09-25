@@ -1,7 +1,7 @@
 /*
 Developed by Tomás Vera & Luis Romero
 Version 1.0
-Usuario Layout Page
+Administrador Layout Page
 */
 
 import type { Metadata } from "next";

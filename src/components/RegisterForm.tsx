@@ -17,6 +17,7 @@ interface RegisterFormProps {
 }
 
 function RegisterForm({ role }: RegisterFormProps) {
+  console.log("Role:", role);
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +49,8 @@ function RegisterForm({ role }: RegisterFormProps) {
     const email = String(fd.get("mail") ?? "").trim();
 
     const address = String(fd.get("address") ?? "").trim();
-    
+    // Por ahora la ubicación es fija
+    const role = String(fd.get("role") ?? "Client").trim();    
     const lon = -74000000;
     const lat = 4300000;
 
@@ -149,6 +151,15 @@ function RegisterForm({ role }: RegisterFormProps) {
         type="text"
         placeholder="Ej: Calle 45 #8-14"
       />
+
+      {role === "Admin" && <><label htmlFor="role">Rol</label><select
+        id="role"
+        name="role"
+      >
+        <option value="Client">Cliente</option>
+        <option value="Worker">Empleado</option>
+        <option value="Admin">Administrador</option>  
+      </select></>}
 
       <button type="submit">Registrar</button>
 
