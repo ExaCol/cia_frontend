@@ -1,0 +1,126 @@
+/*
+Developed by Tomás Vera & Luis Romero
+Version 1.0
+Loading Component Styles
+*/
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-white);
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.label {
+  color: var(--color-black);
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.wrapper {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+}
+
+.pole {
+  width: 6px;
+  height: 80px;
+  background: var(--color-black);
+  border-radius: 3px;
+  opacity: 0.85;
+}
+
+.body {
+  width: 84px;
+  padding: 10px 0;
+  background: #1f2328;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) inset,
+    0 8px 20px rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.light {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+  opacity: 0.25;
+}
+
+/* Colores (usa tu paleta) */
+.red {
+  background: var(--color-red);
+}
+.yellow {
+  background: var(--color-fourth);
+} /* #FDF5AA */
+.green {
+  background: var(--color-third);
+} /* puedes usar #2ecc71 si prefieres */
+
+/* Animación: enciende cada luz por turno */
+.red {
+  animation: glow-red 1.8s infinite;
+}
+.yellow {
+  animation: glow-yellow 1.8s infinite;
+  animation-delay: 0.6s;
+}
+.green {
+  animation: glow-green 1.8s infinite;
+  animation-delay: 1.2s;
+}
+
+@keyframes glow-red {
+  0%,
+  100% {
+    opacity: 0.25;
+    box-shadow: none;
+  }
+  10%,
+  30% {
+    opacity: 1;
+    box-shadow: 0 0 18px rgba(196, 0, 3, 0.55);
+  }
+}
+@keyframes glow-yellow {
+  0%,
+  100% {
+    opacity: 0.25;
+    box-shadow: none;
+  }
+  10%,
+  30% {
+    opacity: 1;
+    box-shadow: 0 0 18px rgba(253, 245, 170, 0.55);
+  }
+}
+@keyframes glow-green {
+  0%,
+  100% {
+    opacity: 0.25;
+    box-shadow: none;
+  }
+  10%,
+  30% {
+    opacity: 1;
+    box-shadow: 0 0 18px rgba(88, 160, 200, 0.55);
+  }
+}
+
+/* Reduce motion: mantiene ciclo sin brillos fuertes */
+@media (prefers-reduced-motion: reduce) {
+  .red,
+  .yellow,
+  .green {
+    animation-duration: 3s;
+  }
+}
