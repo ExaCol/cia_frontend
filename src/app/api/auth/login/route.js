@@ -10,85 +10,68 @@ import axios from "axios";
 
 export async function POST(req) {
   const secretKey = process.env.JWT_KEY;
+
   if (!secretKey) {
-    return NextResponse.json({ message: "JWT_KEY not set" }, { status: 500 });
+    return NextResponse.json(
+      { message: "JWT_KEY not set" },
+      { status: 500 }
+    );
   }
 
-  const { email, password } = await req.json();
+  const { email, password} = await req.json();
 
   const baseUrl = process.env.NEXT_PUBLIC_URL;
   const endpoint = `${baseUrl}/usr/login`;
 
-  let backendData = null;
+  let validUser = null;
   try {
     const backendRes = await axios.request({
-      method: "POST",
+      method: 'POST',
       url: endpoint,
-      headers: { "Content-Type": "application/json" },
-      data: { email, password },
-      validateStatus: () => true,
+      headers: { 'Content-Type': 'application/json' },
+      data: { email, password}
     });
 
-    if (!backendRes || backendRes.status >= 400) {
-      console.error("⚠️ Error del backend auth:", backendRes?.data ?? backendRes?.statusText);
-      return NextResponse.json(
-        { message: backendRes?.data ?? "Error en autenticación externa" },
-        { status: backendRes?.status || 500 }
-      );
-    }
-
-    backendData = backendRes.data;
+    validUser = { email, role: backendRes.data, token : backendRes.data};
   } catch (err) {
-    console.error("⚠️ Error al autenticar (request):", err?.response?.data || err?.message || err);
+    console.error("⚠️ Error al autenticar:", err.response?.data || err);
     return NextResponse.json(
-      { message: err?.response?.data || err?.message || "Error en autenticación" },
-      { status: err?.response?.status || 500 }
+      { message: err.response?.data || err.message },
+      { status: err.response?.status || 500 }
     );
   }
 
-  const role =
-    backendData?.role ??
-    backendData?.rol ??
-    (typeof backendData === "string" ? backendData : null);
-
-  let token = backendData?.token ?? backendData?.accessToken ?? backendData?.jwt ?? null;
-
-  if (!token) {
-    token = jwt.sign(
+  if (validUser) {
+    const token = jwt.sign(
       {
-        email,
-        role,
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 días
+        email: validUser.email,
+        role: validUser.role,
+        token: validUser.token
       },
       secretKey
     );
+
+    const serialized = serialize("loginToken", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7, // 7 días
+      path: "/",
+    });
+
+    const response = NextResponse.json(
+      { message: "Login exitoso", role: validUser.role },
+      { status: 200 }
+    );
+
+    response.headers.set("Set-Cookie", serialized);
+    return response;
   }
 
-  const authObj = {
-    token,
-    role: role ?? null,
-    email: email ?? null,
-  };
-
-  const maxAge = 60 * 60 * 24 * 7; // 7 días en segundos
-  const cookieValue = encodeURIComponent(JSON.stringify(authObj));
-
-  const serialized = serialize("auth", cookieValue, {
-    httpOnly: false,
-    secure: false,
-    sameSite: "lax",
-    maxAge,
-    path: "/",
-  });
-
-  const responseBody = {
-    role: authObj.role,
-    email: authObj.email,
-    message: "Login exitoso",
-  };
-
-  const response = NextResponse.json(responseBody, { status: 200 });
-  response.headers.set("Set-Cookie", serialized);
-  return response;
+  return NextResponse.json(
+    { message: "Credenciales inválidas" },
+    { status: 401 }
+  );
 }
 
