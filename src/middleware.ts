@@ -11,9 +11,9 @@ import { jwtVerify, JWTPayload } from "jose";
 const PUBLIC_PATHS = new Set<string>(["/", "/login", "/register"]);
 
 const ROLE_PREFIX: Record<string, string> = {
-  Worker: "/worker",
+  Empleado: "/worker",
   Admin: "/admin",
-  Client: "/client",
+  Cliente: "/client",
 };
 
 function normalize(p: string) {

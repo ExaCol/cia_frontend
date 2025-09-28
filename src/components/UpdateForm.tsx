@@ -1,11 +1,11 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.3
-Register Form
+Version 1.0
+Update Form
 */
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -18,11 +18,41 @@ interface RegisterFormProps {
   role: string;
 }
 
+//Llenar formulario con datos del usuario
+/*
+useEffect(() => {
+    const fetchUserData = async () => {
+        try {
+            const response = await axios.get(url + "/usr/profile", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            if (response.status === 200) {
+                const userData = response.data;
+                // Llenar los campos del formulario con los datos del usuario
+                (document.getElementById("name") as HTMLInputElement).value = userData.name || "";
+                const [tipoDoc, documento] = userData.identification ? userData.identification.split("-") : ["", ""];
+                (document.getElementById("tipoDoc") as HTMLSelectElement).value = tipoDoc || "cc";
+                (document.getElementById("documento") as HTMLInputElement).value = documento || "";
+                (document.getElementById("mail") as HTMLInputElement).value = userData.email || "";
+                (document.getElementById("address") as HTMLInputElement).value = userData.address || "";
+                (document.getElementById("lon") as HTMLInputElement).value = userData.lon ? userData.lon.toString() : "";
+                (document.getElementById("lat") as HTMLInputElement).value = userData.lat ? userData.lat.toString() : "";
+                (document.getElementById("birth") as HTMLInputElement).value = userData.birth ? new Date(userData.birth).toISOString().split("T")[0] : "";
+                if (role === "Admin" || role === "Worker") {
+                    (document.getElementById("role") as HTMLSelectElement).value = userData.role || "Client";
+                }
+}
+                */
 
 
-function RegisterForm({ role }: RegisterFormProps) {
+
+function UpdateForm({ role }: RegisterFormProps) {
   console.log("Role:", role);
   const router = useRouter();
+
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -195,4 +225,4 @@ function RegisterForm({ role }: RegisterFormProps) {
   );
 }
 
-export default RegisterForm;
+export default UpdateForm;
