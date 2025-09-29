@@ -83,6 +83,15 @@ export default function LoginForm() {
           ¿No tienes cuenta?
         </Link>
       </div>
+
+      <div style={{ marginTop: 6, alignSelf: "center" }}>
+        <Link
+          href="/new-password"
+          style={{ color: "gray", textDecoration: "underline" }}
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
     </form>
   );
 }

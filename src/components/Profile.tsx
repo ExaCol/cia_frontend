@@ -6,16 +6,15 @@ Profile Component (single file)
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-// ====== Tipos locales (sin contraseña) ======
+import Link from "next/link";
 type Vehicle = {
   id: number;
   type: string;
   plate: string;
   soatRateType: string;
   technoClassification: string;
-  soatExpiration: string;   // ISO date
-  technoExpiration: string; // ISO date
+  soatExpiration: string;
+  technoExpiration: string;
 };
 
 type UserProfile = {
@@ -43,11 +42,14 @@ function formatDate(iso: string) {
     return iso;
   }
 }
+interface RegisterFormProps {
+  role: string;
+}
 
-export default function Profile() {
+export default function Profile({ role }: RegisterFormProps) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -76,33 +78,75 @@ export default function Profile() {
   }, []);
 
   if (loading) return <p>Cargando perfil…</p>;
-  if (error)   return <p>Error: {error}</p>;
-  if (!user)   return <p>Sin datos</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!user) return <p>Sin datos</p>;
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto"}}>
+    <div style={{ margin: "0 auto", marginLeft: 10 }}>
       <section style={{ marginBottom: 16 }}>
-        <p><b>Nombre:</b> {user.name}</p>
-        <p><b>Identificación:</b> {user.identification}</p>
-        <p><b>Email:</b> {user.email}</p>
-        <p><b>Rol:</b> {user.role}</p>
-        <p><b>Lat/Lon:</b> {user.lat} / {user.lon}</p>
+        <p>
+          <b>Nombre:</b> {user.name}
+        </p>
+        <p>
+          <b>Identificación:</b> {user.identification}
+        </p>
+        <p>
+          <b>Email:</b> {user.email}
+        </p>
+        <p>
+          <b>Rol:</b> {user.role}
+        </p>
+        <p>
+          <b>Lat/Lon:</b> {user.lat} / {user.lon}
+        </p>
       </section>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Link href={`/${role.toLowerCase()}/profile/update`}>
+          <button>Editar Perfil</button>
+        </Link>
+      </div>
 
-      <h3>Vehículos</h3>
+      {role === "client" && <><h3>Vehículos</h3>
       {user.vehicles?.length ? (
         <ul>
           {user.vehicles.map((v) => (
             <li key={v.id} style={{ marginBottom: 8 }}>
-              <div><b>{v.type}</b> · {v.plate}</div>
-              <div>SOAT ({v.soatRateType}) vence: {formatDate(v.soatExpiration)}</div>
-              <div>Tecnomecánica ({v.technoClassification}) vence: {formatDate(v.technoExpiration)}</div>
+              <div>
+                <b>{v.type}</b> · {v.plate}
+              </div>
+              <div>
+                SOAT ({v.soatRateType}) vence: {formatDate(v.soatExpiration)}
+              </div>
+              <div>
+                Tecnomecánica ({v.technoClassification}) vence:{" "}
+                {formatDate(v.technoExpiration)}
+              </div>
             </li>
           ))}
         </ul>
       ) : (
         <p>No tiene vehículos registrados.</p>
       )}
+      
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Link href='/client/register-vehicle'>
+          <button>Registrar Vehículo</button>
+        </Link>
+      </div>
+      </>}
     </div>
   );
 }

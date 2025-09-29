@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify, JWTPayload } from "jose";
 
-const PUBLIC_PATHS = new Set<string>(["/", "/login", "/register"]);
+const PUBLIC_PATHS = new Set<string>(["/", "/login", "/register", "/new-password"]);
 
 const ROLE_PREFIX: Record<string, string> = {
   Empleado: "/worker",

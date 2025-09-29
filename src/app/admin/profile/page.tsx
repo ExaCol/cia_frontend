@@ -78,7 +78,7 @@ function profile() {
   return (
     <div>
       <h1 style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>Perfil de usuario</h1>
-      <Profile role = "client"/>
+      <Profile role = "admin"/>
       <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
       <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
     </div>

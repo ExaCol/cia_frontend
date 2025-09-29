@@ -6,11 +6,9 @@ Update Form
 "use client";
 
 import React, { useEffect } from "react";
-import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import "@/styles/globals.css";
-import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -20,8 +18,35 @@ interface RegisterFormProps {
 function UpdateForm() {
   const router = useRouter();
   useEffect(() => {
-  } , []);
-  
+    axios
+      .get("/api/auth/token")
+      .then((res) => {
+        const jwt = res.data;
+        axios
+          .get(url + "/usr/user", {
+            headers: {
+              Authorization: `Bearer ${jwt}`,
+            },
+          })
+          .then((res) => {
+            const user = res.data;
+            (document.getElementById("name") as HTMLInputElement).value =
+              user.name;
+            (document.getElementById("mail") as HTMLInputElement).value =
+              user.email;
+          })
+          .catch((err) => {
+            console.error("Error al obtener el usuario:", err);
+            alert("Error al obtener el usuario: " + err.response.data);
+          });
+      })
+      .catch((err) => {
+        console.error("Error al obtener el token JWT:", err);
+        alert("Error al obtener el token JWT");
+        return;
+      });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -30,20 +55,43 @@ function UpdateForm() {
     const email = String(fd.get("mail") ?? "").trim();
 
     const payload = { name, email };
-
-    try {
-      const response = await axios.post(url + "/usr/register", payload);
-      if (response.status === 201) {
-        alert("Usuario registrado con éxito");
-        router.push("/login");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        alert("Error al registrarse: " + error.response.data);
-      } else {
-        alert("Error al registrarse: " + String(error));
-      }
-    }
+    axios
+      .get("/api/auth/token")
+      .then((res) => {
+        const jwt = res.data;
+        axios
+          .patch(url + "/usr/user", payload, {
+            headers: {
+              Authorization: `Bearer ${jwt}`,
+            },
+          })
+          .then((res) => {
+            axios
+              .post("/api/auth/new-token", { token: res.data.token })
+              .then(() => {
+                alert("Usuario actualizado exitosamente");
+                router.push("/client/profile");
+              })
+              .catch((err) => {
+                console.error("Error al actualizar el token:", err);
+                alert("Error al actualizar el token: " + err.response.data);
+              });
+          })
+          .catch((err) => {
+            console.error("Error al actualizar:", err);
+            const msg =
+              err?.response?.data?.message ||
+              err?.response?.data ||
+              err?.message ||
+              "Error al actualizar";
+            alert(msg);
+          });
+      })
+      .catch((err) => {
+        console.error("Error al obtener el token JWT:", err);
+        alert("Error al obtener el token JWT");
+        return;
+      });
   };
 
   return (
@@ -80,7 +128,6 @@ function UpdateForm() {
       />
 
       <button type="submit">Actualizar</button>
-
     </form>
   );
 }
