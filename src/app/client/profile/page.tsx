@@ -30,16 +30,8 @@ function profile() {
             })
             .then((res: any) => {
               if (res.status === 200) {
-                axios
-                  .post("/api/auth/logout")
-                  .then(() => {
-                    alert("Cuenta eliminada exitosamente.");
-                    window.location.href = "/";
-                  })
-                  .catch((error: any) => {
-                    console.error("Error al cerrar sesión:", error);
-                    window.location.href = "/";
-                  });
+                alert("Cuenta eliminada exitosamente.");
+                cerrarSesion(true);
               } else {
                 alert(
                   "Error al eliminar la cuenta. Por favor, intenta nuevamente."
@@ -61,10 +53,33 @@ function profile() {
         });
     }
   };
+
+  const cerrarSesion = async (cuentaEliminada : boolean) => {
+    if(!cuentaEliminada){
+      if (!confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        return;
+      }
+    }
+      axios
+      .post("/api/auth/logout")
+      .then(() => {
+        alert("Sesión cerrada exitosamente.");
+        window.location.href = "/";
+      })
+      .catch((error: any) => {
+        console.error("Error al cerrar sesión:", error);
+        window.location.href = "/";
+      });
+    
+    
+    };
+
+
   return (
     <div>
-      Perfil de usuario
+      <h1>Perfil de usuario</h1>
       <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
+      <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
     </div>
   );
 }
