@@ -22,7 +22,7 @@ function Update() {
         padding: "40px 16px",
       }}
     >
-      <UpdateForm role = "Client"/>
+      <UpdateForm />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.1
-Header Component
+Version 1.0
+Header Worker Component
 */
 
 "use client";
@@ -12,10 +12,10 @@ import { useEffect, useState } from "react";
 import s from "./Header.module.css";
 
 const nav = [
-  { href: "/client", label: "Inicio" },
-  { href: "/client/Oficinas-de-tramites", label: "Oficinas de trámites" },
-  { href: "/client/SIMIT", label: "SIMIT" },
-  { href: "/client/profile", label: "Perfil" },
+  { href: "/worker", label: "Inicio" },
+  { href: "/worker/courses", label: "Cursos" },
+  { href: "/worker/students", label: "Estudiantes" },
+  { href: "/worker/profile", label: "Perfil" },
 ];
 
 export default function Header() {
@@ -39,7 +39,7 @@ export default function Header() {
   return (
     <header className={s.header}>
       <div className={`container ${s.row}`}>
-        <Link href="/client" className={s.logo}>
+        <Link href="/" className={s.logo}>
           SmartTraffic
         </Link>
 

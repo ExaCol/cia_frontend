@@ -8,6 +8,9 @@ Profile Page
 
 import React from "react";
 import axios from "axios";
+import Link from "next/link";
+import Profile from "@/components/Profile";
+
 
 function profile() {
   const eliminarCuenta = async () => {
@@ -70,14 +73,13 @@ function profile() {
         console.error("Error al cerrar sesión:", error);
         window.location.href = "/";
       });
-    
-    
     };
-
 
   return (
     <div>
       <h1>Perfil de usuario</h1>
+      <Profile />
+      <Link href="/client/profile/update"><button>Editar Perfil</button></Link>
       <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
       <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
     </div>

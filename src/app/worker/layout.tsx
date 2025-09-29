@@ -6,7 +6,7 @@ Empleado Layout Page
 
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import Header from "@/components/Header";
+import Header from "@/components/HeaderWorker";
 
 export const viewport = { width: 'device-width', initialScale: 1 };
 
