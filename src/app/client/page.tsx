@@ -4,13 +4,72 @@ Version 1.0
 Usuario Home Page
 */
 
-import "@/styles/globals.css";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
     <div>
-      <h2 style = {{textAlign : "center"}}>Ésta es la página de Cliente de SmartTraffic</h2>
-      <button>Usuario</button>
+      <h2>Realiza consultas al simit de tus vehiculos</h2>
+
+      <div
+        style={{
+          position: "relative",
+          width: "30%",
+          aspectRatio: "4 / 3",
+          margin: "0 auto",
+        }}
+      >
+        <Link href="/client/profile">
+          <Image
+            src="/simit.png"
+            alt="SIMIT"
+            fill
+            className="image_home"
+            priority
+          />
+        </Link>
+      </div>
+
+      <h2>Encuentra oficinas de trámite cercanas a ti</h2>
+      <div
+        style={{
+          position: "relative",
+          width: "30%",
+          aspectRatio: "4 / 3",
+          margin: "0 auto",
+        }}
+      >
+        <Link href="/client/profile">
+          <Image
+            src="/people.png"
+            alt="People"
+            fill
+            className="image_home"
+            priority
+          />
+        </Link>
+      </div>
+      <h2>Para información más detallada accede a tu perfil</h2>
+      <div
+        style={{
+          position: "relative",
+          width: "30%",
+          aspectRatio: "4 / 3",
+          margin: "0 auto",
+        }}
+      >
+        <Link href="/client/profile">
+          <Image
+            src="/user.png"
+            alt="User"
+            fill
+            className="image_home"
+            priority
+          />
+        </Link>
+      </div>
     </div>
   );
 }

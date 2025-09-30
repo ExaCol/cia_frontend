@@ -8,7 +8,6 @@ Profile Page
 
 import React from "react";
 import axios from "axios";
-import Link from "next/link";
 import Profile from "@/components/Profile";
 
 
