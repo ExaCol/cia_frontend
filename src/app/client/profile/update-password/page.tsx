@@ -114,7 +114,7 @@ function UpdatePassword() {
 
         <div style={{ marginTop: 6, alignSelf: "center" }}>
           <Link
-            href="/new-password"
+            href="/client/profile/new-password"
             style={{ color: "gray", textDecoration: "underline" }}
           >
             ¿Olvidaste tu contraseña?
