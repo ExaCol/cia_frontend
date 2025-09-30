@@ -14,7 +14,6 @@ import Profile from "@/components/Profile";
 
 function profile() {
   const eliminarCuenta = async () => {
-    //Alerta de confirmacion si / no para eliminar cuenta
     if (
       confirm(
         "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer."

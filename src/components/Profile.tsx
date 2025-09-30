@@ -1,7 +1,7 @@
 /*
 Developed by Tomás Vera & Luis Romero
 Version 1.0
-Profile Component (single file)
+Profile Component
 */
 
 import React, { useEffect, useState } from "react";
@@ -65,6 +65,12 @@ export default function Profile({ role }: RegisterFormProps) {
 
         if (mounted) setUser(userRes.data);
       } catch (e: any) {
+        if (e.response.status == 401) {
+          setError("Expiró su sesión, cerrando sesión...");
+          axios.post("/api/auth/logout").finally(() => {
+            window.location.href = "/";
+          });
+        }
         console.error("Error obteniendo el perfil:", e);
         if (mounted) setError(e?.message ?? "Error obteniendo el perfil");
       } finally {
@@ -81,92 +87,138 @@ export default function Profile({ role }: RegisterFormProps) {
   if (error) return <p>Error: {error}</p>;
   if (!user) return <p>Sin datos</p>;
 
-  return (
-    <div style={{ margin: "0 auto", marginLeft: 10 }}>
-      <section style={{ marginBottom: 16 }}>
-        <p>
-          <b>Nombre:</b> {user.name}
-        </p>
-        <p>
-          <b>Identificación:</b> {user.identification}
-        </p>
-        <p>
-          <b>Email:</b> {user.email}
-        </p>
-        <p>
-          <b>Rol:</b> {user.role}
-        </p>
-        <p>
-          <b>Lat/Lon:</b> {user.lat} / {user.lon}
-        </p>
-      </section>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+  const handleDeleteVehicle = (vehiclePlate: string) => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este vehículo?")) {
+      return;
+    }
+    axios
+      .get("/api/auth/token")
+      .then(async (response: any) => {
+        const token = response.data;
+        axios
+          .delete(process.env.NEXT_PUBLIC_URL + `/vehicle/byPlate/${vehiclePlate}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res: any) => {
+            if (res.status === 200) {
+              alert("Vehículo eliminado exitosamente.");
+              // Actualizar la lista de vehículos en el estado
+              setUser((prevUser) => {
+                if (!prevUser) return prevUser;
+                return {
+                  ...prevUser,
+                  vehicles: prevUser.vehicles.filter((v) => v.plate !== vehiclePlate),
+                };
+              });
+            } else {
+              alert(
+                "Error al eliminar el vehículo. Por favor, intenta nuevamente."
+              );
+            }
+          })
+          .catch((error: any) => {
+            console.error("Error al eliminar el vehículo:", error);
+            alert("Error al obtener el token. Por favor, intenta nuevamente.");
+          });
+      })
+      .catch((error: any) => {
+        console.error("Error al obtener el token:", error);
+        alert("Error al obtener el token. Por favor, intenta nuevamente.");
+      });
+
+   
+  };
+   return (
+      <div style={{ margin: "0 auto", marginLeft: 10 }}>
+        <section style={{ marginBottom: 16 }}>
+          <p>
+            <b>Nombre:</b> {user.name}
+          </p>
+          <p>
+            <b>Identificación:</b> {user.identification}
+          </p>
+          <p>
+            <b>Email:</b> {user.email}
+          </p>
+          <p>
+            <b>Rol:</b> {user.role}
+          </p>
+          <p>
+            <b>Lat/Lon:</b> {user.lat} / {user.lon}
+          </p>
+        </section>
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            alignContent: "center",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Link href={`/${role.toLowerCase()}/profile/update`}>
-            <button>Editar Perfil</button>
-          </Link>
-          <div style={{ marginTop: 6, alignSelf: "center" }}>
-            <Link
-              href={`/${role.toLowerCase()}/profile/update-password`}
-              style={{ color: "gray", textDecoration: "underline" }}
-            >
-              ¿Quieres actualizar tu contraseña?
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {role === "client" && (
-        <>
-          <h3>Vehículos</h3>
-          {user.vehicles?.length ? (
-            <ul>
-              {user.vehicles.map((v) => (
-                <li key={v.id} style={{ marginBottom: 8 }}>
-                  <div>
-                    <b>{v.type}</b> · {v.plate}
-                  </div>
-                  <div>
-                    SOAT ({v.soatRateType}) vence:{" "}
-                    {formatDate(v.soatExpiration)}
-                  </div>
-                  <div>
-                    Tecnomecánica ({v.technoClassification}) vence:{" "}
-                    {formatDate(v.technoExpiration)}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No tiene vehículos registrados.</p>
-          )}
-
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "column",
+              gap: 6,
+              alignContent: "center",
             }}
           >
-            <Link href="/client/register-vehicle">
-              <button>Registrar Vehículo</button>
+            <Link href={`/${role.toLowerCase()}/profile/update`}>
+              <button>Editar Perfil</button>
             </Link>
+            <div style={{ marginTop: 6, alignSelf: "center" }}>
+              <Link
+                href={`/${role.toLowerCase()}/profile/update-password`}
+                style={{ color: "gray", textDecoration: "underline" }}
+              >
+                ¿Quieres actualizar tu contraseña?
+              </Link>
+            </div>
           </div>
-        </>
-      )}
-    </div>
-  );
+        </div>
+
+        {role === "client" && (
+          <>
+            <h3>Vehículos</h3>
+            {user.vehicles?.length ? (
+              <ul>
+                {user.vehicles.map((v) => (
+                  <li key={v.id} style={{ marginBottom: 8 }}>
+                    <div>
+                      <b>{v.type}</b> · {v.plate}
+                    </div>
+                    <div>
+                      SOAT ({v.soatRateType}) vence:{" "}
+                      {formatDate(v.soatExpiration)}
+                    </div>
+                    <div>
+                      Tecnomecánica ({v.technoClassification}) vence:{" "}
+                      {formatDate(v.technoExpiration)}
+                    </div>
+                    <button onClick={() => handleDeleteVehicle(v.plate)} >
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No tiene vehículos registrados.</p>
+            )}
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Link href="/client/register-vehicle">
+                <button>Registrar Vehículo</button>
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    );
 }
