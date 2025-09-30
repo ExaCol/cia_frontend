@@ -1,12 +1,12 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.1
-Layout Component
+Version 1.0
+Administrador Layout Page
 */
+
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import Footer from "@/components/Footer";
-import AppSplash from "@/components/AppSplash";
+import Header from "@/components/HeaderAdmin";
 
 export const viewport = { width: 'device-width', initialScale: 1 };
 
@@ -21,12 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className="layout">
-        <AppSplash minMs={1600} />
+      <div className="layout">
+        <Header />
         <main className="content">{children}</main>
-        <Footer />
-      </body>
-    </html>
+      </div>
   );
 }

@@ -1,0 +1,119 @@
+.btn {
+  font: inherit;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+.full {
+  width: 100%;
+}
+
+.sm {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+.md {
+  padding: 8px 14px;
+  font-size: 16px;
+}
+.lg {
+  padding: 10px 18px;
+  font-size: 17px;
+}
+
+/* Paleta */
+.primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+.primary:hover {
+  background: color-mix(in oklab, var(--color-primary), black 8%);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+.secondary:hover {
+  background: color-mix(in oklab, var(--color-secondary), black 8%);
+  transform: translateY(-1px);
+}
+
+.third {
+  background: var(--color-third);
+  color: var(--color-white);
+}
+.third:hover {
+  background: color-mix(in oklab, var(--color-third), black 8%);
+  transform: translateY(-1px);
+}
+
+.fourth {
+  background: var(--color-fourth);
+  color: var(--color-black);
+  border: 1px solid var(--color-holder);
+}
+.fourth:hover {
+  background: color-mix(in oklab, var(--color-fourth), black 6%);
+  transform: translateY(-1px);
+}
+
+.holder {
+  background: var(--color-holder);
+  color: var(--color-white);
+}
+.holder:hover {
+  background: color-mix(in oklab, var(--color-holder), black 8%);
+  transform: translateY(-1px);
+}
+
+.black {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+.black:hover {
+  background: color-mix(in oklab, var(--color-black), white 12%);
+  transform: translateY(-1px);
+}
+
+.white {
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 1px solid var(--color-holder);
+}
+.white:hover {
+  background: color-mix(in oklab, var(--color-white), black 6%);
+  transform: translateY(-1px);
+}
+
+.red {
+  background: var(--color-red);
+  color: var(--color-white);
+}
+.red:hover {
+  background: color-mix(in oklab, var(--color-red), black 8%);
+  transform: translateY(-1px);
+}
+
+.redDark {
+  background: var(--color-red-dark);
+  color: var(--color-white);
+}
+.redDark:hover {
+  background: color-mix(in oklab, var(--color-red-dark), black 8%);
+  transform: translateY(-1px);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-holder);
+}
+.ghost:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
