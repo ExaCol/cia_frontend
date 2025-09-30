@@ -21,9 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <body className="layout">
+      <div className="layout">
         <Header />
         <main className="content">{children}</main>
-      </body>
+      </div>
   );
 }

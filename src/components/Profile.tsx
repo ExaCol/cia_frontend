@@ -107,46 +107,66 @@ export default function Profile({ role }: RegisterFormProps) {
           justifyContent: "center",
         }}
       >
-        <Link href={`/${role.toLowerCase()}/profile/update`}>
-          <button>Editar Perfil</button>
-        </Link>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            alignContent: "center",
+          }}
+        >
+          <Link href={`/${role.toLowerCase()}/profile/update`}>
+            <button>Editar Perfil</button>
+          </Link>
+          <div style={{ marginTop: 6, alignSelf: "center" }}>
+            <Link
+              href={`/${role.toLowerCase()}/profile/update-password`}
+              style={{ color: "gray", textDecoration: "underline" }}
+            >
+              ¿Quieres actualizar tu contraseña?
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {role === "client" && <><h3>Vehículos</h3>
-      {user.vehicles?.length ? (
-        <ul>
-          {user.vehicles.map((v) => (
-            <li key={v.id} style={{ marginBottom: 8 }}>
-              <div>
-                <b>{v.type}</b> · {v.plate}
-              </div>
-              <div>
-                SOAT ({v.soatRateType}) vence: {formatDate(v.soatExpiration)}
-              </div>
-              <div>
-                Tecnomecánica ({v.technoClassification}) vence:{" "}
-                {formatDate(v.technoExpiration)}
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No tiene vehículos registrados.</p>
+      {role === "client" && (
+        <>
+          <h3>Vehículos</h3>
+          {user.vehicles?.length ? (
+            <ul>
+              {user.vehicles.map((v) => (
+                <li key={v.id} style={{ marginBottom: 8 }}>
+                  <div>
+                    <b>{v.type}</b> · {v.plate}
+                  </div>
+                  <div>
+                    SOAT ({v.soatRateType}) vence:{" "}
+                    {formatDate(v.soatExpiration)}
+                  </div>
+                  <div>
+                    Tecnomecánica ({v.technoClassification}) vence:{" "}
+                    {formatDate(v.technoExpiration)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No tiene vehículos registrados.</p>
+          )}
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Link href="/client/register-vehicle">
+              <button>Registrar Vehículo</button>
+            </Link>
+          </div>
+        </>
       )}
-      
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Link href='/client/register-vehicle'>
-          <button>Registrar Vehículo</button>
-        </Link>
-      </div>
-      </>}
     </div>
   );
 }
