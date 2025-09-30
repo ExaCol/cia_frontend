@@ -22,7 +22,7 @@ function Register() {
         padding: "40px 16px",
       }}
     >
-      <RegisterForm role = "Client"/>
+      <RegisterForm role = "Cliente"/>
     </div>
   );
 }

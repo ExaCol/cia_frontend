@@ -53,7 +53,7 @@ function RegisterForm({ role }: RegisterFormProps) {
     const email = String(fd.get("mail") ?? "").trim();
 
     const address = String(fd.get("address") ?? "").trim();
-    const roleValue = String(fd.get("role") ?? "Client").trim();
+    const roleValue = String(fd.get("role") ?? "Cliente").trim();
 
     const lonStr = String(fd.get("lon") ?? "").trim();
     const latStr = String(fd.get("lat") ?? "").trim();
@@ -164,8 +164,8 @@ function RegisterForm({ role }: RegisterFormProps) {
         <>
           <label htmlFor="role">Rol</label>
           <select id="role" name="role">
-            <option value="Client">Cliente</option>
-            <option value="Worker">Empleado</option>
+            <option value="Cliente">Cliente</option>
+            <option value="Empleado">Empleado</option>
             <option value="Admin">Administrador</option>
           </select>
         </>
@@ -175,8 +175,8 @@ function RegisterForm({ role }: RegisterFormProps) {
         <>
           <label htmlFor="role">Rol</label>
           <select id="role" name="role">
-            <option value="Client">Cliente</option>
-            <option value="Worker">Empleado</option>
+            <option value="Cliente">Cliente</option>
+            <option value="Empleado">Empleado</option>
           </select>
         </>
       )}

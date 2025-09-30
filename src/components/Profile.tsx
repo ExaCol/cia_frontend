@@ -70,9 +70,10 @@ export default function Profile({ role }: RegisterFormProps) {
           axios.post("/api/auth/logout").finally(() => {
             window.location.href = "/";
           });
+        }else{
+            setError(e?.message ?? "Error obteniendo el perfil")
         }
         console.error("Error obteniendo el perfil:", e);
-        if (mounted) setError(e?.message ?? "Error obteniendo el perfil");
       } finally {
         if (mounted) setLoading(false);
       }
