@@ -70,3 +70,11 @@ input:focus, select:focus, textarea:focus {
     outline: none;
     transform: scale(1.02);
 }
+
+.image_home{
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+.image_home:hover { 
+    transform: scale(1.05);
+}

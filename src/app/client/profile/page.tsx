@@ -8,13 +8,11 @@ Profile Page
 
 import React from "react";
 import axios from "axios";
-import Link from "next/link";
 import Profile from "@/components/Profile";
 
 
 function profile() {
   const eliminarCuenta = async () => {
-    //Alerta de confirmacion si / no para eliminar cuenta
     if (
       confirm(
         "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer."
