@@ -14,7 +14,7 @@ import s from "./Header.module.css";
 const nav = [
   { href: "/admin", label: "Inicio" },
   { href: "/admin/courses", label: "Cursos" },
-  { href: "/admin/users", label: "Usuarios" },
+  { href: "/admin/register", label: "Usuarios" },
   { href: "/admin/profile", label: "Pefil" }
 ];
 
