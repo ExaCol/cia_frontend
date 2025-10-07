@@ -35,7 +35,7 @@ function Administrador() {
           margin: "0 auto"
         }}
       >
-        <Link href="/admin/profile">
+        <Link href="/admin/stats">
           <Image
             src="/user.png"
             alt="User"
