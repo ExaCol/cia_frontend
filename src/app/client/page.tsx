@@ -11,6 +11,11 @@ import Image from 'next/image';
 export default function Home() {
   return (
     <div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <Link href="/client/services/new">
+          <button>Solicitar servicio</button>
+        </Link>
+      </div>
       <h2>Realiza consultas al simit de tus vehiculos</h2>
 
       <div
@@ -70,11 +75,7 @@ export default function Home() {
           />
         </Link>
       </div>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-        <Link href="/client/services/new">
-          <button>Solicitar servicio</button>
-        </Link>
-      </div>
+
 
     </div>
   );
