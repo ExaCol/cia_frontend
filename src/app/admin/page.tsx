@@ -15,7 +15,7 @@ function Administrador() {
           margin: "0 auto"
         }}
       >
-        <Link href="/admin/profile">
+        <Link href="/admin/courses">
           <Image
             src="/taxi.png"
             alt="Taxi"

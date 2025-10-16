@@ -42,6 +42,7 @@ function formatDate(iso: string) {
     return iso;
   }
 }
+
 interface RegisterFormProps {
   role: string;
 }
