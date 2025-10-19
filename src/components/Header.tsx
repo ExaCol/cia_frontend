@@ -13,7 +13,7 @@ import s from "./Header.module.css";
 
 const nav = [
   { href: "/client", label: "Inicio" },
-  { href: "/client/Oficinas-de-tramites", label: "Oficinas de trámites" },
+  { href: "/client/oficinas-tramites", label: "Oficinas de trámites" },
   { href: "/client/services", label: "Servicios" },
   { href: "/client/profile", label: "Perfil" },
 ];
