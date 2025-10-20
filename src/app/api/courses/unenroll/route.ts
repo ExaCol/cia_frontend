@@ -22,9 +22,8 @@ async function getBackendJWT() {
 
 export async function DELETE(req: Request) {
   try {
-    // el backend espera el OBJETO CURSO completo en el body
     const course = await req.json(); // { id, name, parcialCapacity, capacity }
-    const jwt = await getBackendJWT();
+    const jwt  = await getBackendJWT();
     const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/,"") || "http://localhost:8080";
 
     const resp = await fetch(`${base}/usr/deleteUserFromCourse`, {

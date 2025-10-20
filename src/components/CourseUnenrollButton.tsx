@@ -1,14 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export type Course = {
-  id: number | string;
-  name: string;
-  parcialCapacity?: number;
-  capacity?: number;
-};
+export type Course = { id: number|string; name: string; parcialCapacity?: number; capacity?: number; };
 
 export default function CourseUnenrollButton({ course }: { course: Course }) {
   const [open, setOpen] = useState(false);
@@ -37,10 +31,7 @@ export default function CourseUnenrollButton({ course }: { course: Course }) {
 
   return (
     <>
-      <button className="rounded px-3 py-1 text-sm border" onClick={() => setOpen(true)}>
-        Cancelar curso
-      </button>
-
+      <button className="rounded px-3 py-1 text-sm border" onClick={() => setOpen(true)}>Cancelar curso</button>
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => !loading && setOpen(false)} />
@@ -48,9 +39,7 @@ export default function CourseUnenrollButton({ course }: { course: Course }) {
             <h3 className="font-semibold text-base">Confirmar cancelación</h3>
             <p className="text-sm">¿Seguro que deseas cancelar tu inscripción a “{course.name}”?</p>
             <div className="flex justify-end gap-2">
-              <button className="border rounded px-3 py-1 text-sm" onClick={() => setOpen(false)} disabled={loading}>
-                No
-              </button>
+              <button className="border rounded px-3 py-1 text-sm" onClick={() => setOpen(false)} disabled={loading}>No</button>
               <button className="border rounded px-3 py-1 text-sm" onClick={onConfirm} disabled={loading}>
                 {loading ? "Cancelando..." : "Sí, cancelar"}
               </button>

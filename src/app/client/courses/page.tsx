@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import CourseEnrollButton, { Course } from "@/components/CourseEnrollButton";
+import CourseUnenrollButton from "@/components/CourseUnenrollButton";
 
 function extractJWT(anyVal: any): string | null {
   if (typeof anyVal === "string" && anyVal.split(".").length === 3) return anyVal;
@@ -22,12 +23,12 @@ async function getBackendJWT() {
   return jwt;
 }
 
-async function getJSON<T=any>(path: string): Promise<T> {
+async function getJSON<T = any>(path: string): Promise<T> {
   const jwt = await getBackendJWT();
-  const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/,"") || "http://localhost:8080";
+  const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/, "") || "http://localhost:8080";
   const r = await fetch(`${base}${path}`, { headers: { Authorization: `Bearer ${jwt}` }, cache: "no-store" });
   if (!r.ok) {
-    const text = await r.text().catch(()=>"");
+    const text = await r.text().catch(() => "");
     try { const j = JSON.parse(text); throw new Error(j?.message || j?.error || text || `Error ${r.status}`); }
     catch { throw new Error(text || `Error ${r.status}`); }
   }
@@ -40,12 +41,12 @@ export default async function ClientCoursesPage() {
   let error: string | null = null;
 
   try {
-    // Endpoints USR (Postman):
+    // Endpoints USR:
     // - GET /usr/getAllCourses
     // - GET /usr/courseByUser
     allCourses = await getJSON<Course[]>("/usr/getAllCourses");
     myCourses = await getJSON<Course[]>("/usr/courseByUser");
-  } catch (e:any) {
+  } catch (e: any) {
     error = e?.message || "No se pudo cargar cursos";
   }
 
@@ -63,6 +64,7 @@ export default async function ClientCoursesPage() {
 
       {error && <p>{error}</p>}
 
+      {/* ====== INSCRITOS ====== */}
       <section className="space-y-2">
         <h3 className="text-lg font-semibold">Inscritos</h3>
         {(!myCourses || myCourses.length === 0) ? (
@@ -75,6 +77,8 @@ export default async function ClientCoursesPage() {
                 <th>Curso</th>
                 <th>Cupos usados</th>
                 <th>Cupos totales</th>
+                {/* NUEVO */}
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -84,6 +88,10 @@ export default async function ClientCoursesPage() {
                   <td>{c.name}</td>
                   <td>{c.parcialCapacity ?? "-"}</td>
                   <td>{c.capacity ?? "-"}</td>
+                  {/* NUEVO */}
+                  <td>
+                    <CourseUnenrollButton course={c} />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -91,6 +99,7 @@ export default async function ClientCoursesPage() {
         )}
       </section>
 
+      {/* ====== DISPONIBLES ====== */}
       <section className="space-y-2">
         <h3 className="text-lg font-semibold">Cursos disponibles</h3>
         {(!allCourses || allCourses.length === 0) ? (

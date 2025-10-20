@@ -15,7 +15,7 @@ function extractJWT(anyVal: any): string | null {
 
 async function getBackendJWT() {
   const cookieHeader = (await cookies()).getAll().map(c => `${c.name}=${c.value}`).join("; ");
-  const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/,"") || "http://localhost:3000";
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
   const r = await fetch(`${site}/api/auth/token`, { headers: { Cookie: cookieHeader }, cache: "no-store" });
   if (!r.ok) return null;
   const data = await r.json().catch(() => ({}));
@@ -26,7 +26,7 @@ async function fetchUser() {
   const jwt = await getBackendJWT();
   if (!jwt) return { ok: false, status: 401, user: null };
 
-  const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/,"") || "http://localhost:8080";
+  const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/, "") || "http://localhost:8080";
   const r = await fetch(`${base}/usr/user`, {
     headers: { Authorization: `Bearer ${jwt}` },
     cache: "no-store",
@@ -55,13 +55,11 @@ function isWorkerOrAdmin(user: any): boolean {
 
   // variantes comunes
   const allowed = new Set([
-    "WORKER",
-    "ADMIN",
-    "EMPLOYEE",
+    "EMPLEADO",
+    "ADMINISTRADOR",
+    "ROLE_EMPLEADO",
+    "ROLE_ADMINISTRADOR",
     "TRABAJADOR",
-    "ROLE_WORKER",
-    "ROLE_ADMIN",
-    "ROLE_EMPLOYEE",
   ]);
 
   return allowed.has(role);
@@ -85,9 +83,6 @@ export default async function NewCoursePage() {
       </div>
     );
   }
-
-  // ✅ DEBUG TEMPORAL: muestra qué rol está llegando
-  // Quita este bloque cuando validemos el rol correcto
   const debugRole =
     user?.role ?? user?.rol ?? user?.Role ??
     user?.roles?.[0]?.name ?? user?.authorities?.[0]?.authority ??
@@ -98,7 +93,7 @@ export default async function NewCoursePage() {
       <div className="space-y-4">
         <h2>Crear curso</h2>
         <p>No tienes permisos para acceder a esta página (se requiere rol Empleado o Admin).</p>
-        <p style={{opacity:0.7, fontSize:12}}>
+        <p style={{ opacity: 0.7, fontSize: 12 }}>
           Rol detectado: <code>{String(debugRole)}</code> (temporal para depurar)
         </p>
         <Link href="/"><button>Volver al inicio</button></Link>

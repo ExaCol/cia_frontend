@@ -22,23 +22,19 @@ async function getBackendJWT() {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json(); // { name, capacity, parcialCapacity }
-    const jwt = await getBackendJWT();
+    const body = await req.json(); // { name, parcialCapacity, capacity }
+    const jwt  = await getBackendJWT();
     const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/,"") || "http://localhost:8080";
 
     const resp = await fetch(`${base}/coursesData/createCourse`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt}` },
       body: JSON.stringify(body),
     });
 
     const text = await resp.text();
-    let parsed: any = null;
-    try { parsed = JSON.parse(text); } catch {}
-    return NextResponse.json(parsed ?? { ok: resp.ok }, { status: resp.status });
+    try { return NextResponse.json(JSON.parse(text), { status: resp.status }); }
+    catch { return NextResponse.json({ message: text || "Error creando curso" }, { status: resp.status }); }
   } catch (e:any) {
     return NextResponse.json({ message: e?.message || "Error creando curso" }, { status: 500 });
   }

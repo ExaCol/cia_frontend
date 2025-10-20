@@ -81,12 +81,20 @@ export default async function ServicesListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2>Mis servicios</h2>
-        <Link href="/client/services/new">
-          <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
-            Solicitar servicio
-          </button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/client/courses">
+            <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
+              Mis cursos
+            </button>
+          </Link>
+          <Link href="/client/services/new">
+            <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
+              Solicitar servicio
+            </button>
+          </Link>
+        </div>
       </div>
+
 
       {error ? (
         <p>{error}</p>
@@ -116,10 +124,10 @@ export default async function ServicesListPage() {
                   status === "CANCELLED" || status === "CANCELED"
                     ? "border-red-300 text-red-700 bg-red-50"
                     : status === "COMPLETED" || status === "FINISHED"
-                    ? "border-green-300 text-green-700 bg-green-50"
-                    : status === "PENDING" || status === "CREATED" || status === "EN_PROCESO" || status === "SOLICITADO"
-                    ? "border-amber-300 text-amber-700 bg-amber-50"
-                    : "border-slate-300 text-slate-700 bg-slate-50";
+                      ? "border-green-300 text-green-700 bg-green-50"
+                      : status === "PENDING" || status === "CREATED" || status === "EN_PROCESO" || status === "SOLICITADO"
+                        ? "border-amber-300 text-amber-700 bg-amber-50"
+                        : "border-slate-300 text-slate-700 bg-slate-50";
 
                 return (
                   <tr

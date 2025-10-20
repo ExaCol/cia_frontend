@@ -27,13 +27,19 @@ export default function CourseCreateForm() {
           capacity: Number(capacity),
         }),
       });
+
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        alert(data?.message || "No se pudo crear el curso.");
+        if (res.status === 403){
+          alert("No tienes permiso para crear cursos.");
+          return;
+        }
+        alert(data?.message || `No se pudo crear el curso. (${res.status})`);
         return;
       }
       alert("Curso creado con éxito.");
-      router.push("/worker/courses"); // ajusta si tu lista está en otra ruta
+      router.push("/worker/courses");
       router.refresh();
     } finally {
       setLoading(false);
