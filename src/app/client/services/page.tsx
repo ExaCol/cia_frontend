@@ -19,10 +19,8 @@ function extractJWT(anyVal: any): string | null {
 
 /** Obtiene el token del BACKEND pidiendo a /api/auth/token (flujo oficial del proyecto) */
 async function getBackendJWTViaApiRoute(): Promise<string> {
-  // Reenvía todas las cookies del user al API Route, para que obtenga el token correcto
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-
   const site =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
 
@@ -43,7 +41,6 @@ async function getBackendJWTViaApiRoute(): Promise<string> {
 
 async function getServices(): Promise<any[]> {
   const jwt = await getBackendJWTViaApiRoute();
-
   const base =
     process.env.NEXT_PUBLIC_URL?.replace(/\/+$/, "") ?? "http://localhost:8080";
 
@@ -52,7 +49,6 @@ async function getServices(): Promise<any[]> {
     cache: "no-store",
   });
 
-  // Manejo de errores del backend (intenta mostrar mensaje claro)
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     try {
@@ -63,12 +59,10 @@ async function getServices(): Promise<any[]> {
     }
   }
 
-  // Caso especial 200 con texto "No hay servicios..."
   try {
     const list = await res.json();
     return Array.isArray(list) ? list : [];
   } catch {
-    // Si el back devuelve texto plano sin JSON
     return [];
   }
 }
@@ -84,12 +78,13 @@ export default async function ServicesListPage() {
   }
 
   return (
-    <div>
-      <h2>Mis servicios</h2>
-
-      <div style={{ margin: "12px 0" }}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2>Mis servicios</h2>
         <Link href="/client/services/new">
-          <button>Solicitar servicio</button>
+          <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
+            Solicitar servicio
+          </button>
         </Link>
       </div>
 
@@ -98,41 +93,67 @@ export default async function ServicesListPage() {
       ) : services.length === 0 ? (
         <p>No hay servicios todavía.</p>
       ) : (
-        <div>
-          <table>
+        <div className="overflow-x-auto">
+          <table className="min-w-[960px] w-full border-separate border-spacing-0 rounded-xl overflow-hidden">
             <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Placa</th>
-                <th>Expira</th>
-                <th>Aseguradora</th>
-                <th>Duración</th>
-                <th>Graduado</th>
-                <th>Detalle</th>
-                <th>Acciones</th>
+              <tr className="bg-black/5 text-left">
+                <th className="py-3 pl-4 pr-3 text-sm font-semibold">ID</th>
+                <th className="py-3 px-3 text-sm font-semibold">Tipo</th>
+                <th className="py-3 px-3 text-sm font-semibold">Placa</th>
+                <th className="py-3 px-3 text-sm font-semibold">Expira</th>
+                <th className="py-3 px-3 text-sm font-semibold">Aseguradora</th>
+                <th className="py-3 px-3 text-sm font-semibold">Duración</th>
+                <th className="py-3 px-3 text-sm font-semibold">Graduado</th>
+                <th className="py-3 px-3 text-sm font-semibold">Estado</th>
+                <th className="py-3 px-3 text-sm font-semibold">Detalle</th>
+                <th className="py-3 pr-4 pl-3 text-sm font-semibold text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {services.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.id}</td>
-                  <td>{s.serviceType ?? "-"}</td>
-                  <td>{s.plate ?? "-"}</td>
-                  <td>{s.exp_date ?? "-"}</td>
-                  <td>{s.assurance ?? "-"}</td>
-                  <td>{s.duration ?? "-"}</td>
-                  <td>{s.graduated ? "Sí" : "No"}</td>
-                  <td>
-                    <Link href={`/client/services/${s.id}`}>
-                      <button>Ver</button>
-                    </Link>
-                  </td>
-                  <td>
-                    <ServiceCancelButton serviceId={s.id} />
-                  </td>
-                </tr>
-              ))}
+              {services.map((s: any, idx: number) => {
+                const status = String(s.status ?? "").toUpperCase();
+                const pill =
+                  status === "CANCELLED" || status === "CANCELED"
+                    ? "border-red-300 text-red-700 bg-red-50"
+                    : status === "COMPLETED" || status === "FINISHED"
+                    ? "border-green-300 text-green-700 bg-green-50"
+                    : status === "PENDING" || status === "CREATED" || status === "EN_PROCESO" || status === "SOLICITADO"
+                    ? "border-amber-300 text-amber-700 bg-amber-50"
+                    : "border-slate-300 text-slate-700 bg-slate-50";
+
+                return (
+                  <tr
+                    key={s.id}
+                    className={idx % 2 ? "bg-white" : "bg-slate-50/60"}
+                  >
+                    <td className="py-3 pl-4 pr-3 text-sm">{s.id}</td>
+                    <td className="py-3 px-3 text-sm">{s.serviceType ?? "-"}</td>
+                    <td className="py-3 px-3 text-sm">{s.plate ?? "-"}</td>
+                    <td className="py-3 px-3 text-sm">{s.exp_date ?? "-"}</td>
+                    <td className="py-3 px-3 text-sm">{s.assurance ?? "-"}</td>
+                    <td className="py-3 px-3 text-sm">{s.duration ?? "-"}</td>
+                    <td className="py-3 px-3 text-sm">{s.graduated ? "Sí" : "No"}</td>
+                    <td className="py-3 px-3 text-sm">
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${pill}`}>
+                        {s.status ?? "-"}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-sm">
+                      <Link href={`/client/services/${s.id}`}>
+                        <button className="rounded-lg border px-3 py-1.5 text-xs hover:bg-black/5 transition">
+                          Ver
+                        </button>
+                      </Link>
+                    </td>
+                    <td className="py-3 pr-4 pl-3 text-sm">
+                      <div className="flex items-center justify-end">
+                        {/* Siempre permite cancelar: pasa el objeto completo para mostrar tipo/placa en el modal */}
+                        <ServiceCancelButton service={s} />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
