@@ -15,7 +15,8 @@ const nav = [
   { href: "/admin", label: "Inicio" },
   { href: "/admin/courses", label: "Cursos" },
   { href: "/admin/register", label: "Usuarios" },
-  { href: "/admin/profile", label: "Pefil" }
+  { href: "/admin/profile", label: "Perfil" },
+  { href: "/admin/partners", label: "Aliados" }
 ];
 
 export default function Header() {

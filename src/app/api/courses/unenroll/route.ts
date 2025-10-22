@@ -20,22 +20,25 @@ async function getBackendJWT() {
   return jwt;
 }
 
-export async function POST(req: Request) {
+export async function DELETE(req: Request) {
   try {
-    const body = await req.json(); // { name, parcialCapacity, capacity }
+    const course = await req.json(); // { id, name, parcialCapacity, capacity }
     const jwt  = await getBackendJWT();
     const base = process.env.NEXT_PUBLIC_URL?.replace(/\/+$/,"") || "http://localhost:8080";
 
-    const resp = await fetch(`${base}/coursesData/createCourse`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt}` },
-      body: JSON.stringify(body),
+    const resp = await fetch(`${base}/usr/deleteUserFromCourse`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify(course),
     });
 
     const text = await resp.text();
     try { return NextResponse.json(JSON.parse(text), { status: resp.status }); }
-    catch { return NextResponse.json({ message: text || "Error creando curso" }, { status: resp.status }); }
+    catch { return NextResponse.json({ ok: resp.ok }, { status: resp.status }); }
   } catch (e:any) {
-    return NextResponse.json({ message: e?.message || "Error creando curso" }, { status: 500 });
+    return NextResponse.json({ message: e?.message || "Error cancelando curso" }, { status: 500 });
   }
 }

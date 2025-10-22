@@ -71,6 +71,11 @@ export default function Home() {
         </Link>
       </div>
 
+      
+        <Link href="/client/payments" className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium border hover:opacity-90 transition">
+          Ver pagos
+        </Link>
+
 
     </div>
   );
