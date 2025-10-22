@@ -1,7 +1,7 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.0
-Partners Component
+Version 1.2
+Partners Component (Listar/Editar/Eliminar) con AddressAutocompleteInput
 */
 
 "use client";
@@ -9,6 +9,7 @@ Partners Component
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 type Partner = {
   id?: number;
@@ -28,8 +29,6 @@ export default function Partners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Estado de edición local (solo para actualizar)
   const [editForm, setEditForm] = useState<Partner | null>(null);
   const [updating, setUpdating] = useState(false);
 
@@ -81,13 +80,8 @@ export default function Partners() {
     const { name, value, type, checked } = e.target;
     setEditForm({
       ...editForm,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : name === "lat" || name === "lon"
-          ? Number(value)
-          : value,
-    });
+      [name]: type === "checkbox" ? checked : value,
+    } as Partner);
   };
 
   const submitUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -95,14 +89,20 @@ export default function Partners() {
     if (!editForm?.id) return alert("Falta ID para actualizar");
     setUpdating(true);
     try {
+      const fd = new FormData(e.currentTarget);
+      const latStr = String(fd.get("lat") ?? "").trim();
+      const lonStr = String(fd.get("lon") ?? "").trim();
+      const lat = latStr ? Number(latStr) : Number(editForm.lat);
+      const lon = lonStr ? Number(lonStr) : Number(editForm.lon);
+
       const headers = await getAuthHeader();
       const payload = {
         id: editForm.id,
         name: editForm.name,
-        lat: editForm.lat,
-        lon: editForm.lon,
-        soat: editForm.soat,
-        techno: editForm.techno,
+        lat,
+        lon,
+        soat: Boolean(editForm.soat),
+        techno: Boolean(editForm.techno),
       };
       await api.patch("/partners/partner", payload, { headers });
       alert("Partner actualizado");
@@ -138,14 +138,12 @@ export default function Partners() {
   return (
     <div style={{ padding: 16, maxWidth: 1000, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <h1 style={{ marginTop: 0 }}>Partners</h1>
-        {/* Botón para ir a registrar partner */}
+        <h1 style={{ marginTop: 0 }}>Aliados</h1>
         <Link href="/admin/register-partner">
-          <button>Registrar Partner</button>
+          <button>Registrar Aliado</button>
         </Link>
       </div>
 
-      {/* Editar Partner (solo cuando hay uno seleccionado) */}
       {editForm && (
         <form
           onSubmit={submitUpdate}
@@ -156,9 +154,10 @@ export default function Partners() {
             padding: 12,
             borderRadius: 8,
             marginBottom: 16,
+            overflow: "visible",
           }}
         >
-          <h3 style={{ margin: 0 }}>Actualizar Partner</h3>
+          <h3 style={{ margin: 0 }}>Actualizar Aliados</h3>
 
           <div>
             <label style={{ display: "block", fontWeight: 600 }}>ID</label>
@@ -174,28 +173,21 @@ export default function Partners() {
               required
             />
           </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <div>
-              <label style={{ display: "block", fontWeight: 600 }}>Lat</label>
-              <input
-                name="lat"
-                type="number"
-                value={editForm.lat}
-                onChange={handleEditChange}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontWeight: 600 }}>Lon</label>
-              <input
-                name="lon"
-                type="number"
-                value={editForm.lon}
-                onChange={handleEditChange}
-                required
-              />
-            </div>
+          <div style={{ position: "relative", zIndex: 9999, overflow: "visible" }}>
+            <label htmlFor="address" style={{ display: "block", fontWeight: 600 }}>
+              Ubicación (opcional si no cambias)
+            </label>
+            <AddressAutocompleteInput
+              id="address"
+              name="address"
+              placeholder="Ej: Calle 45 #8-14"
+              lang="es"
+              biasLat={4.7110}
+              biasLon={-74.0721}
+            />
+            <small style={{ color: "#666" }}>
+              Si no seleccionas una nueva ubicación, se conservarán las coordenadas actuales ({editForm.lat}, {editForm.lon}).
+            </small>
           </div>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -229,7 +221,6 @@ export default function Partners() {
         </form>
       )}
 
-      {/* Estado */}
       {error && (
         <div
           style={{
@@ -245,7 +236,6 @@ export default function Partners() {
       )}
       {loading && <p>Cargando partners…</p>}
 
-      {/* Tabla */}
       {!loading && (
         <>
           {partners.length ? (

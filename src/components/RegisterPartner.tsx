@@ -1,19 +1,17 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.0
-Register Partner Component
+Version 1.2
+Register Partner Component con AddressAutocompleteInput
 */
-
 "use client";
 
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 type PartnerCreate = {
   name: string;
-  lat: number;
-  lon: number;
   soat: boolean;
   techno: boolean;
 };
@@ -28,8 +26,6 @@ export default function RegisterPartner() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<PartnerCreate>({
     name: "",
-    lat: 0,
-    lon: 0,
     soat: false,
     techno: false,
   });
@@ -48,20 +44,13 @@ export default function RegisterPartner() {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : name === "lat" || name === "lon"
-          ? Number(value)
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const resetForm = () =>
     setForm({
       name: "",
-      lat: 0,
-      lon: 0,
       soat: false,
       techno: false,
     });
@@ -70,11 +59,29 @@ export default function RegisterPartner() {
     e.preventDefault();
     setSaving(true);
     try {
+      const fd = new FormData(e.currentTarget);
+      const latStr = String(fd.get("lat") ?? "").trim();
+      const lonStr = String(fd.get("lon") ?? "").trim();
+
+      if (!latStr || !lonStr) {
+        alert("Selecciona una ubicación válida desde el autocompletado.");
+        setSaving(false);
+        return;
+      }
+
+      const payload = {
+        name: form.name,
+        lat: Number(latStr),
+        lon: Number(lonStr),
+        soat: form.soat,
+        techno: form.techno,
+      };
+
       const headers = await getAuthHeader();
-      await api.post("/partners/create", form, { headers });
+      await api.post("/partners/create", payload, { headers });
       alert("Partner creado");
       resetForm();
-      router.push("/partners");
+      router.push("/admin/partners");
     } catch (e: any) {
       console.error("Error creando partner:", e);
       alert(
@@ -94,9 +101,10 @@ export default function RegisterPartner() {
         border: "1px solid #ddd",
         padding: 12,
         borderRadius: 8,
+        overflow: "visible",
       }}
     >
-      <h3 style={{ margin: 0 }}>Registrar Partner</h3>
+      <h3 style={{ margin: 0 }}>Registrar Aliado</h3>
 
       <div>
         <label style={{ display: "block", fontWeight: 600 }}>Nombre</label>
@@ -108,30 +116,21 @@ export default function RegisterPartner() {
           required
         />
       </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        <div>
-          <label style={{ display: "block", fontWeight: 600 }}>Lat</label>
-          <input
-            name="lat"
-            type="number"
-            value={form.lat}
-            onChange={handleChange}
-            placeholder="Ej: 46831000"
-            required
-          />
-        </div>
-        <div>
-          <label style={{ display: "block", fontWeight: 600 }}>Lon</label>
-          <input
-            name="lon"
-            type="number"
-            value={form.lon}
-            onChange={handleChange}
-            placeholder="Ej: -74205000"
-            required
-          />
-        </div>
+      <div style={{ position: "relative", zIndex: 9999, overflow: "visible" }}>
+        <label htmlFor="address" style={{ display: "block", fontWeight: 600 }}>
+          Ubicación
+        </label>
+        <AddressAutocompleteInput
+          id="address"
+          name="address"
+          placeholder="Ej: Calle 45 #8-14"
+          lang="es"
+          biasLat={4.7110}
+          biasLon={-74.0721}
+        />
+        <small style={{ color: "#666" }}>
+          Selecciona una opción del listado para capturar coordenadas.
+        </small>
       </div>
 
       <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -158,7 +157,7 @@ export default function RegisterPartner() {
         <button type="submit" disabled={saving}>
           {saving ? "Guardando..." : "Registrar"}
         </button>
-        <button type="button" onClick={() => router.push("/partners")} disabled={saving}>
+        <button type="button" onClick={() => router.push("/admin/partners")} disabled={saving}>
           Volver
         </button>
       </div>
