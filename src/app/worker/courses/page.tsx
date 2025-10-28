@@ -64,7 +64,7 @@ export default function Courses() {
           return;
         }
         setUserId(uid);
-        setMessage(`Usuario encontrado: ${email}`);
+        //setMessage(`Usuario encontrado: ${email}`);
 
         // 3) Obtener cursos disponibles (SIN email)
         const coursesResp = await axios.get(`${url}${COURSES_ENDPOINT}`, {
@@ -136,7 +136,7 @@ export default function Courses() {
       });
 
       if (resp.status >= 200 && resp.status < 300) {
-        setSuccessEnrollMsg(`Inscripción exitosa en "${courseName}"`);
+        //(`Inscripción exitosa en "${courseName}"`);
       } else {
         setError(`No se pudo inscribir (status ${resp.status}).`);
       }
