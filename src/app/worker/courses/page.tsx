@@ -128,7 +128,7 @@ export default function Courses() {
         courseId,     // ajusta si espera 'idCourse', etc.
       };
 
-      const resp = await axios.post(`${url}/usr/registerCourse/${payload.userId}/${payload.courseId}`, null, {
+      const resp = await axios.post(`${url}/coursesData/enroll/${payload.userId}/${payload.courseId}`, null, {
         headers: {
           authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
