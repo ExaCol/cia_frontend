@@ -88,7 +88,8 @@ export default async function NewCoursePage() {
     user?.roles?.[0]?.name ?? user?.authorities?.[0]?.authority ??
     user?.perfil ?? user?.tipo ?? user?.type ?? user?.userType ?? "(sin rol)";
 
-  if (!isWorkerOrAdmin(user)) {
+    
+  /*if (!isWorkerOrAdmin(user)) {
     return (
       <div className="space-y-4">
         <h2>Crear curso</h2>
@@ -99,7 +100,7 @@ export default async function NewCoursePage() {
         <Link href="/"><button>Volver al inicio</button></Link>
       </div>
     );
-  }
+  }*/
 
   return (
     <div className="space-y-6">
