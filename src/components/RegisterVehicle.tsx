@@ -23,9 +23,7 @@ function RegisterVehicle() {
     const plate = String(fd.get("plate") ?? "").trim();
     const soatRateType = String(fd.get("soatRateType") ?? "").trim();
     const type = String(fd.get("type") ?? "").trim();
-    const technoClassification = String(
-      fd.get("technoClassification") ?? ""
-    ).trim();
+    const model = String(fd.get("model") ?? "").trim();
     const soatExpiration = String(fd.get("soatExpiration") ?? "").trim();
     const technoExpiration = String(fd.get("technoExpiration") ?? "").trim();
 
@@ -33,7 +31,7 @@ function RegisterVehicle() {
       plate,
       soatRateType,
       type,
-      technoClassification,
+      model,
       soatExpiration,
       technoExpiration,
     };
@@ -55,7 +53,7 @@ function RegisterVehicle() {
           })
           .catch((err) => {
             console.error("Error al registrar el vehículo:", err);
-            alert("Error al registrar el vehículo: "  + err.response.data);
+            alert("Error al registrar el vehículo: " + err.response.data);
           });
       })
       .catch((err) => {
@@ -115,12 +113,19 @@ function RegisterVehicle() {
         <option value="Volqueta">Volqueta</option>
       </select>
 
-      <label htmlFor="technoClassification">Clasificación Tecnomecánica </label>
-      <select id="technoClassification" name="technoClassification" defaultValue="Particular" required>
-        <option value="Particular">Particular</option>
-        <option value="Publico">Público</option>
-        <option value="Comercial">Comercial</option>
-      </select>
+      <label htmlFor="model">Modelo (año)</label>
+      <input
+        id="model"
+        name="model"
+        type="number"
+        inputMode="numeric"
+        placeholder="Ej: 2011"
+        min={2008}
+        max={new Date().getFullYear()}
+        step={1}
+        required
+        pattern="\d{4}"
+      />
 
       <label htmlFor="soatExpiration">Vencimiento del SOAT</label>
       <input id="soatExpiration" name="soatExpiration" type="date" required />

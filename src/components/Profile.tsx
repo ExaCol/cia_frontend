@@ -12,7 +12,7 @@ type Vehicle = {
   type: string;
   plate: string;
   soatRateType: string;
-  technoClassification: string;
+  model: string;
   soatExpiration: string;
   technoExpiration: string;
 };
@@ -191,16 +191,21 @@ export default function Profile({ role }: RegisterFormProps) {
                       <b>{v.type}</b> · {v.plate}
                     </div>
                     <div>
-                      SOAT ({v.soatRateType}) vence:{" "}
+                      Tipo de SOAT ({v.soatRateType}) · Vencimiento de SOAT:{" "}
                       {formatDate(v.soatExpiration)}
                     </div>
                     <div>
-                      Tecnomecánica ({v.technoClassification}) vence:{" "}
+                      Modelo ({v.model}) · Vencimiento de Tecnomecánica:{" "}
                       {formatDate(v.technoExpiration)}
                     </div>
                     <button onClick={() => handleDeleteVehicle(v.plate)} >
                       Eliminar
                     </button>
+                    <Link href = "/client/update-vehicle/[plate]" as = {'/client/update-vehicle/' + v.plate}>
+                    <button>
+                      Editar
+                    </button></Link>
+                    
                   </li>
                 ))}
               </ul>
