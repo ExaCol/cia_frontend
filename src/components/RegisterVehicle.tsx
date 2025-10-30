@@ -19,9 +19,59 @@ function RegisterVehicle() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
 
+    const soatRateType = String(fd.get("soatRateType") ?? "").trim();
+
+    const validSoatRates = [
+      "100",
+      "110",
+      "120",
+      "130",
+      "140",
+      "150",
+      "211",
+      "212",
+      "221",
+      "222",
+      "231",
+      "232",
+      "310",
+      "320",
+      "330",
+      "410",
+      "420",
+      "430",
+      "511",
+      "512",
+      "521",
+      "522",
+      "531",
+      "532",
+      "611",
+      "612",
+      "621",
+      "622",
+      "711",
+      "712",
+      "721",
+      "722",
+      "731",
+      "732",
+      "810",
+      "910",
+      "920",
+    ];
+
+    if (!validSoatRates.includes(soatRateType)) {
+      alert(
+        `El tipo de tarifa SOAT "${soatRateType}" no es válido. Debe ser uno de: ${validSoatRates.join(
+          ", "
+        )}`
+      );
+      return;
+    }
+
     // Recolectar datos
     const plate = String(fd.get("plate") ?? "").trim();
-    const soatRateType = String(fd.get("soatRateType") ?? "").trim();
     const type = String(fd.get("type") ?? "").trim();
     const model = String(fd.get("model") ?? "").trim();
     const soatExpiration = String(fd.get("soatExpiration") ?? "").trim();
@@ -98,19 +148,11 @@ function RegisterVehicle() {
 
       <label htmlFor="type">Tipo</label>
       <select id="type" name="type" defaultValue="Automovil" required>
-        <option value="Automovil">Automóvil</option>
-        <option value="Bus">Bus</option>
-        <option value="Buseta">Buseta</option>
-        <option value="Camion">Camión</option>
-        <option value="Camioneta">Camioneta</option>
-        <option value="Campero">Campero</option>
-        <option value="Microbus">Microbus</option>
-        <option value="Tractocamion">Tractocamión</option>
-        <option value="Motocicleta">Motocicleta</option>
-        <option value="Motocarro">Motocarro</option>
-        <option value="Mototriciclo">Mototriciclo</option>
-        <option value="Cuatriomoto">Cuatriomoto</option>
-        <option value="Volqueta">Volqueta</option>
+        <option value="Motos">Moto</option>
+        <option value="Liviano Particular">Liviano Particular</option>
+        <option value="Liviano Privado">Liviano Privado</option>
+        <option value="Pesado Particular">Pesado Particular</option>
+        <option value="Pesado Privado">Pesado Privado</option>
       </select>
 
       <label htmlFor="model">Modelo (año)</label>
