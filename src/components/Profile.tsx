@@ -201,7 +201,7 @@ export default function Profile({ role }: RegisterFormProps) {
                     <button onClick={() => handleDeleteVehicle(v.plate)} >
                       Eliminar
                     </button>
-                    <Link href = "/client/update-vehicle/[plate]" as = {'/client/update-vehicle/' + v.plate}>
+                    <Link href = {`/client/update-vehicle/?plate=${v.plate}&soatExpiration=${v.soatExpiration}&technoExpiration=${v.technoExpiration}&id=${v.id}`} >
                     <button>
                       Editar
                     </button></Link>
