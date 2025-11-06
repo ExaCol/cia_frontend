@@ -4,34 +4,13 @@ Version 1.0
 Usuario Home Page
 */
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
     <div>
-      <h2>Realiza consultas al simit de tus vehiculos</h2>
-
-      <div
-        style={{
-          position: "relative",
-          width: "30%",
-          aspectRatio: "4 / 3",
-          margin: "0 auto",
-        }}
-      >
-        <Link href="/client/profile">
-          <Image
-            src="/simit.png"
-            alt="SIMIT"
-            fill
-            className="image_home"
-            priority
-          />
-        </Link>
-      </div>
-
       <h2>Encuentra oficinas de trámite cercanas a ti</h2>
       <div
         style={{
@@ -41,7 +20,7 @@ export default function Home() {
           margin: "0 auto",
         }}
       >
-        <Link href="/client/profile">
+        <Link href="/client/services">
           <Image
             src="/people.png"
             alt="People"
@@ -51,6 +30,7 @@ export default function Home() {
           />
         </Link>
       </div>
+
       <h2>Para información más detallada accede a tu perfil</h2>
       <div
         style={{
@@ -71,12 +51,30 @@ export default function Home() {
         </Link>
       </div>
 
-      
-        <Link href="/client/payments" className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium border hover:opacity-90 transition">
-          Ver pagos
+      <h2>Realiza consultas al simit de tus vehiculos</h2>
+
+      <div
+        style={{
+          position: "relative",
+          width: "30%",
+          aspectRatio: "4 / 3",
+          margin: "0 auto",
+        }}
+      >
+        <Link
+          href="https://www.fcm.org.co/simit/#/home-public"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <Image
+            src="/simit.png"
+            alt="SIMIT"
+            fill
+            className="image_home"
+            priority
+          />
         </Link>
-
-
+      </div>
     </div>
   );
 }

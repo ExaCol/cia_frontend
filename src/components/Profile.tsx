@@ -33,15 +33,29 @@ const api = axios.create({
   timeout: 10000,
 });
 
-function formatDate(iso: string) {
-  try {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString();
-  } catch {
-    return iso;
+function formatDate(s: string) {
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.trim());
+  if (ymd) {
+    const [, y, m, d] = ymd;
+    return `${y}-${m}-${d}`;
   }
+
+  const dmy = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s.trim());
+  if (dmy) {
+    const [, d, m, y] = dmy;
+    return `${y}-${m}-${d}`;
+  }
+
+  const d = new Date(s);
+  if (isNaN(d.getTime())) return s;
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
+
+
 
 interface RegisterFormProps {
   role: string;
@@ -259,7 +273,7 @@ export default function Profile({ role }: RegisterFormProps) {
                         Eliminar
                       </button>
                       <Link
-                        href={`/client/update-vehicle/?plate=${v.plate}&soatExpiration=${v.soatExpiration}&technoExpiration=${v.technoExpiration}&id=${v.id}`}
+                        href={`/client/update-vehicle/?plate=${v.plate}&soatExpiration=${formatDate(v.soatExpiration)}&technoExpiration=${formatDate(v.technoExpiration)}&id=${v.id}`}
                       >
                         <button>Editar</button>
                       </Link>

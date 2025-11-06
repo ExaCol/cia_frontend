@@ -51,8 +51,7 @@ export default function ServiceForm() {
         setPass(true);
         if (mounted) setPlates(onlyPlates);
       } catch (e: any) {
-        // 401 -> cerrar sesión
-        if (e?.response?.status === 401) {
+        if (e.response.status == 401) {
           axios
             .post("/api/auth/logout")
             .finally(() => (window.location.href = "/"));

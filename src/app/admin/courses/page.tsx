@@ -15,9 +15,6 @@ function CoursesPage() {
     <div>
       <h1>Cursos de Conducción</h1>
       <Courses />
-      <Link href="/admin/courses/new">
-        <button style={{ marginTop: "20px" }}>Agregar Curso</button>
-        </Link>
     </div>
   );
 }

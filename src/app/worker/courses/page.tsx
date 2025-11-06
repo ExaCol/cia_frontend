@@ -402,12 +402,12 @@ export default function Courses() {
           <table className="min-w-full border border-gray-200 text-sm">
             <thead>
               <tr className="bg-gray-50">
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">capacity</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">name</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">parcial capacity</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">price</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">type</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">acciones</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Capacidad</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Nombre</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Capacidad Parcial (Disponible)</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Precio</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Tipo</th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Acciones</th>
               </tr>
             </thead>
             <tbody>

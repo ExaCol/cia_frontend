@@ -15,7 +15,7 @@ function Worker() {
           margin: "0 auto",
         }}
       >
-        <Link href="/worker/profile">
+        <Link href="/worker/courses">
           <Image
             src="/taxi.png"
             alt="Taxi"
@@ -35,7 +35,7 @@ function Worker() {
           margin: "0 auto",
         }}
       >
-        <Link href="/worker/profile">
+        <Link href="/worker/stats">
           <Image
             src="/user.png"
             alt="User"

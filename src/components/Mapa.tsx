@@ -167,7 +167,7 @@ export default function Mapa() {
                   })
                   .then((res) => {
                     alert("Servicio registrado exitosamente");
-                    router.push("/");
+                    router.push("/client/services");
                   })
                   .catch((err) => {
                     console.error("Error al registrar el servicio:", err);
@@ -186,8 +186,7 @@ export default function Mapa() {
           const wrap = document.createElement("div");
           wrap.innerHTML = `
       <div style="min-width:220px">
-        <strong>${p.nombre}</strong><br/>
-        ID: ${p.id}
+        <h3>${p.nombre}</h3><br/>
         <form id="frm-${p.id}" style="margin-top:8px; display:flex; gap:6px; align-items:center">
           <input type="hidden" name="partnerId" value="${p.id}" />
           <button type="submit">Registrar servicio</button>

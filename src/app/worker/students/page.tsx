@@ -5,7 +5,7 @@ function Students() {
   return (
     <div>
       <h1>Estudiantes</h1>
-      <Link href="/worker/register"><button>Registrar Estudiante</button></Link>
+      <Link href="/worker/register"><button>Registrar Usuario</button></Link>
     </div>
   )
 }

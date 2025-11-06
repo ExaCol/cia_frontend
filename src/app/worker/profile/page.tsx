@@ -79,8 +79,23 @@ function profile() {
     <div>
       <h1 style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>Perfil de usuario</h1>
       <Profile role = "worker"/>
-      <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
-      <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
+      <hr></hr>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "10px",
+          marginBottom: "20px",
+        }}
+      >
+        <button style={{ background: "red" }} onClick={() => cerrarSesion(false)}>
+          Cerrar Sesión
+        </button>
+        <button style={{ background: "red" }} onClick={eliminarCuenta}>
+          Eliminar Cuenta
+        </button>
+      </div>
     </div>
   );
 }

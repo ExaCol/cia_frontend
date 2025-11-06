@@ -31,7 +31,7 @@ function UpdateVehicleForm() {
       const { data: jwt } = await axios.get("/api/auth/token");
 
       await axios.patch(
-        `${url}/vehicle/update-vehicle/${encodeURIComponent(id)}/${encodeURIComponent(soatExpiration)}/${encodeURIComponent(technoExpiration)}`,
+        `${url}/vehicle/update-vehicle/${id}/${soatExpiration}/${technoExpiration}`,
         null,
         {
           headers: { Authorization: `Bearer ${jwt}` },

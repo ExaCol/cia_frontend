@@ -23,19 +23,37 @@ function OficinasTramites() {
     setServiceType(service);
     setCourseType(course);
     setPlate(plateC);
-      if(!service){
-        router.push("/client/profile");
-        return;
-      
+    if(service !== "SOAT" && service !== "TECNO" && service !== "COURSE"){
+      router.push("/client/services");
+      return;
+    }else if((service === "SOAT" || service === "TECNO") && !plateC){
+      router.push("/client/services");
+      return;
+    }else if(service === "COURSE" && !course){
+      router.push("/client/services");
+      return;
     }
   }, [sp]);
 
   return (
     <div>
       <h1>Oficinas de trámite cercanas</h1>
-      <p>
-        Por favor, elige una ubicación para solicitar tu servicio de {serviceType}
-      </p>
+      {courseType === "COMPARENDO" && <p>
+        Por favor, elige una ubicación para asistir a tu curso para pago de comparendos.
+      </p>}
+
+      {courseType && courseType !== "COMPARENDO" && <p>
+        Por favor, elige una ubicación para asistir a tu curso de conducción {courseType}
+      </p>}
+
+      {serviceType === "SOAT" && (<p>
+        Por favor, elige una ubicación para solicitar tu servicio con el SOAT para el vehículo de placa {plate}
+      </p>)}
+
+      {serviceType === "TECNO" && (<p>
+        Por favor, elige una ubicación para solicitar tu servicio de tecnomecánica para el vehículo de placa {plate}
+      </p>)}
+      
       <Mapa />
     </div>
   );

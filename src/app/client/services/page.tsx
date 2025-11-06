@@ -82,11 +82,6 @@ export default async function ServicesListPage() {
       <div className="flex items-center justify-between">
         <h2>Mis servicios</h2>
         <div className="flex gap-2">
-          <Link href="/client/courses">
-            <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
-              Mis cursos
-            </button>
-          </Link>
           <Link href="/client/services/new">
             <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
               Solicitar servicio
