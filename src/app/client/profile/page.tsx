@@ -10,7 +10,6 @@ import React from "react";
 import axios from "axios";
 import Profile from "@/components/Profile";
 
-
 function profile() {
   const eliminarCuenta = async () => {
     if (
@@ -55,13 +54,13 @@ function profile() {
     }
   };
 
-  const cerrarSesion = async (cuentaEliminada : boolean) => {
-    if(!cuentaEliminada){
+  const cerrarSesion = async (cuentaEliminada: boolean) => {
+    if (!cuentaEliminada) {
       if (!confirm("¿Estás seguro de que deseas cerrar sesión?")) {
         return;
       }
     }
-      axios
+    axios
       .post("/api/auth/logout")
       .then(() => {
         alert("Sesión cerrada exitosamente.");
@@ -71,14 +70,37 @@ function profile() {
         console.error("Error al cerrar sesión:", error);
         window.location.href = "/";
       });
-    };
+  };
 
   return (
     <div>
-      <h1 style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>Perfil de usuario</h1>
-      <Profile role = "client"/>
-      <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
-      <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
+      <h1
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        Perfil de usuario
+      </h1>
+      <Profile role="client" />
+      <hr></hr>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "10px",
+          marginBottom: "20px",
+        }}
+      >
+        <button style={{ background: "red" }} onClick={() => cerrarSesion(false)}>
+          Cerrar Sesión
+        </button>
+        <button style={{ background: "red" }} onClick={eliminarCuenta}>
+          Eliminar Cuenta
+        </button>
+      </div>
     </div>
   );
 }

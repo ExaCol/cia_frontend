@@ -85,6 +85,7 @@ export default function Header() {
           </Link>
         ))}
       </nav>
+      <hr></hr>
     </header>
   );
 }

@@ -6,6 +6,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className={s.footer}>
+      <hr></hr>
       <div className="container">
         <div className={s.brand}>
         <a href="https://exacol.github.io/ExaPages/" target="_blank" rel="noopener noreferrer" className={s.logoLink} arial-label="Exa">

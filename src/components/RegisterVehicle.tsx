@@ -70,12 +70,19 @@ function RegisterVehicle() {
       return;
     }
 
-    // Recolectar datos
+    //validar placa
     const plate = String(fd.get("plate") ?? "").trim();
+    if(!/^[A-Z]{3}\d{3}$/.test(plate)){
+      alert("La placa debe tener el formato ABC123 (3 letras mayúsculas seguidas de 3 números).");
+      return;
+    }
+
+    // Recolectar datos
     const type = String(fd.get("type") ?? "").trim();
     const model = String(fd.get("model") ?? "").trim();
     const soatExpiration = String(fd.get("soatExpiration") ?? "").trim();
     const technoExpiration = String(fd.get("technoExpiration") ?? "").trim();
+
 
     const payload = {
       plate,

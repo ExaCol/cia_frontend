@@ -71,8 +71,8 @@ export default function Profile({ role }: RegisterFormProps) {
           axios.post("/api/auth/logout").finally(() => {
             window.location.href = "/";
           });
-        }else{
-            setError(e?.message ?? "Error obteniendo el perfil")
+        } else {
+          setError(e?.message ?? "Error obteniendo el perfil");
         }
         console.error("Error obteniendo el perfil:", e);
       } finally {
@@ -98,11 +98,14 @@ export default function Profile({ role }: RegisterFormProps) {
       .then(async (response: any) => {
         const token = response.data;
         axios
-          .delete(process.env.NEXT_PUBLIC_URL + `/vehicle/byPlate/${vehiclePlate}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+          .delete(
+            process.env.NEXT_PUBLIC_URL + `/vehicle/byPlate/${vehiclePlate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
           .then((res: any) => {
             if (res.status === 200) {
               alert("Vehículo eliminado exitosamente.");
@@ -111,7 +114,9 @@ export default function Profile({ role }: RegisterFormProps) {
                 if (!prevUser) return prevUser;
                 return {
                   ...prevUser,
-                  vehicles: prevUser.vehicles.filter((v) => v.plate !== vehiclePlate),
+                  vehicles: prevUser.vehicles.filter(
+                    (v) => v.plate !== vehiclePlate
+                  ),
                 };
               });
             } else {
@@ -129,28 +134,33 @@ export default function Profile({ role }: RegisterFormProps) {
         console.error("Error al obtener el token:", error);
         alert("Error al obtener el token. Por favor, intenta nuevamente.");
       });
-
-   
   };
-   return (
-      <div style={{ margin: "0 auto", marginLeft: 10 }}>
-        <section style={{ marginBottom: 16 }}>
-          <p>
-            <b>Nombre:</b> {user.name}
-          </p>
-          <p>
-            <b>Identificación:</b> {user.identification}
-          </p>
-          <p>
-            <b>Email:</b> {user.email}
-          </p>
-          <p>
-            <b>Rol:</b> {user.role}
-          </p>
-          <p>
-            <b>Lat/Lon:</b> {user.lat} / {user.lon}
-          </p>
-        </section>
+
+  return (
+    <div style={{ margin: "0 auto", marginLeft: 10 }}>
+      <section style={{ marginBottom: 16 }}>
+        <p>
+          <b>Nombre:</b> {user.name}
+        </p>
+
+        <p>
+          <b>Identificación:</b> {user.identification}
+        </p>
+        <p>
+          <b>Correo Electrónico:</b> {user.email}
+        </p>
+        <p>
+          <b>Rol:</b> {user.role}
+        </p>
+        <p>
+          <Link
+            href={`https://www.google.com/maps/search/?api=1&query=${user.lat},${user.lon}`}
+            target="_blank"
+            style={{ color: "black", textDecoration: "underline" }}
+          >
+            <b>Ubicación:</b>
+          </Link>
+        </p>
         <div
           style={{
             display: "flex",
@@ -158,74 +168,123 @@ export default function Profile({ role }: RegisterFormProps) {
             justifyContent: "center",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-              alignContent: "center",
-            }}
-          >
+          <iframe
+            width="800"
+            height="300"
+            style={{ border: 0 }}
+            loading="lazy"
+            allowFullScreen
+            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_API_KEY}&q=${user.lat},${user.lon}&zoom=15`}
+          />
+        </div>
+      </section>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            alignContent: "center",
+          }}
+        >
+          <div style={{ marginTop: 6, alignSelf: "center" }}>
             <Link href={`/${role.toLowerCase()}/profile/update`}>
               <button>Editar Perfil</button>
             </Link>
-            <div style={{ marginTop: 6, alignSelf: "center" }}>
-              <Link
-                href={`/${role.toLowerCase()}/profile/update-password`}
-                style={{ color: "gray", textDecoration: "underline" }}
-              >
-                ¿Quieres actualizar tu contraseña?
-              </Link>
-            </div>
+          </div>
+
+          <div style={{ marginTop: 6, alignSelf: "center", marginBottom: 10 }}>
+            <Link
+              href={`/${role.toLowerCase()}/profile/update-password`}
+              style={{ color: "gray", textDecoration: "underline" }}
+            >
+              ¿Quieres actualizar tu contraseña?
+            </Link>
           </div>
         </div>
+      </div>
 
-        {role === "client" && (
-          <>
-            <h3>Vehículos</h3>
-            {user.vehicles?.length ? (
-              <ul>
+      {role === "client" && (
+        <>
+          <hr></hr>
+          <h3>Vehículos</h3>
+          {user.vehicles?.length ? (
+            <div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "0.5fr 0.5fr 0.6fr 0.5fr 0.3fr",
+                  gap: "2px 2px",
+                  fontWeight: 600,
+                  marginBottom: 2,
+                }}
+              >
+                <div>Tipo / Placa</div>
+                <div>Modelo</div>
+                <div>SOAT (tipo)</div>
+                <div>Vencimientos</div>
+                <div>Acciones</div>
+              </div>
+
+              {/* Filas */}
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {user.vehicles.map((v) => (
-                  <li key={v.id} style={{ marginBottom: 8 }}>
+                  <li
+                    key={v.id}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1.0fr 1fr 1.2fr 1.2fr 0.8fr",
+                      gap: "8px 12px",
+                      alignItems: "center",
+                      padding: "8px 0",
+                    }}
+                  >
                     <div>
                       <b>{v.type}</b> · {v.plate}
                     </div>
+                    <div>{v.model}</div>
+                    <div>SOAT ({v.soatRateType})</div>
                     <div>
-                      Tipo de SOAT ({v.soatRateType}) · Vencimiento de SOAT:{" "}
-                      {formatDate(v.soatExpiration)}
-                    </div>
-                    <div>
-                      Modelo ({v.model}) · Vencimiento de Tecnomecánica:{" "}
+                      SOAT: {formatDate(v.soatExpiration)} · Tecno:{" "}
                       {formatDate(v.technoExpiration)}
                     </div>
-                    <button onClick={() => handleDeleteVehicle(v.plate)} >
-                      Eliminar
-                    </button>
-                    <Link href = {`/client/update-vehicle/?plate=${v.plate}&soatExpiration=${v.soatExpiration}&technoExpiration=${v.technoExpiration}&id=${v.id}`} >
-                    <button>
-                      Editar
-                    </button></Link>
-                    
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => handleDeleteVehicle(v.plate)}>
+                        Eliminar
+                      </button>
+                      <Link
+                        href={`/client/update-vehicle/?plate=${v.plate}&soatExpiration=${v.soatExpiration}&technoExpiration=${v.technoExpiration}&id=${v.id}`}
+                      >
+                        <button>Editar</button>
+                      </Link>
+                    </div>
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p>No tiene vehículos registrados.</p>
-            )}
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Link href="/client/register-vehicle">
-                <button>Registrar Vehículo</button>
-              </Link>
             </div>
-          </>
-        )}
-      </div>
-    );
+          ) : (
+            <p>No tiene vehículos registrados.</p>
+          )}
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Link href="/client/register-vehicle">
+              <button>Registrar Vehículo</button>
+            </Link>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
