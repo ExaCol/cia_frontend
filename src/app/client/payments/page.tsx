@@ -73,12 +73,20 @@ export default async function ClientPaymentsPage() {
 
   return (
     <div className="space-y-6">
+      
       <div className="flex items-center justify-between">
-        <h2>Mis pagos</h2>
-        <Link href="/client">
-          <button>Volver</button>
-        </Link>
-      </div>
+  <h2>Mis pagos</h2>
+  <div className="flex gap-2">
+    {/* Botón nuevo hacia la vista aislada */}
+    <Link href="/client/payments/history">
+      <button className="border px-3 py-1 rounded">Historial de pagos </button>
+    </Link>
+
+    <Link href="/client">
+      <button>Volver</button>
+    </Link>
+  </div>
+</div>
 
       {/* Resumen opcional */}
       {summary && (
@@ -130,3 +138,5 @@ export default async function ClientPaymentsPage() {
     </div>
   );
 }
+
+
