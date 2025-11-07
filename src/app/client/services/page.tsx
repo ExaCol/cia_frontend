@@ -1,8 +1,9 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.1
-Client Services List
+Version 2.1
+Client Services List (incluye cursos inscritos)
 */
+
 import Link from "next/link";
 import { cookies } from "next/headers";
 import "@/styles/globals.css";
@@ -10,7 +11,7 @@ import ServiceCancelButton from "@/components/ServiceCancelButton";
 import ServicePayButton from "@/components/ServicePayButton";
 import { formatCOP } from "@/lib/format";
 
-/** Extrae un JWT de diferentes envolturas */
+/** ==================== Helpers Auth ==================== */
 function extractJWT(anyVal: any): string | null {
   if (typeof anyVal === "string" && anyVal.split(".").length === 3)
     return anyVal;
@@ -35,7 +36,22 @@ function extractJWT(anyVal: any): string | null {
   return null;
 }
 
-/** Obtiene el token del BACKEND pidiendo a /api/auth/token (flujo oficial del proyecto) */
+function normalizeCourseType(input?: string | null): string | null {
+  if (!input) return null;
+  const s = String(input).toUpperCase();
+  const m1 = s.match(/\b([ABC][123])\b/);
+  if (m1) return m1[1];
+  const m2 = s.match(/([ABC][123])\s*CURSO/);
+  if (m2) return m2[1];
+  const m3 = s.match(/COURSE\S*\s*([ABC][123])/);
+  if (m3) return m3[1];
+  const m4 = s.match(/([ABC][123])\s*COURSE/);
+  if (m4) return m4[1];
+  const m5 = s.match(/([ABC][123])/);
+  if (m5) return m5[1];
+  return null;
+}
+
 async function getBackendJWTViaApiRoute(): Promise<string> {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -51,69 +67,154 @@ async function getBackendJWTViaApiRoute(): Promise<string> {
     cache: "no-store",
   });
 
-  if (!r.ok) {
-    throw new Error("Sesión expirada. Inicia sesión nuevamente.");
-  }
-
+  if (!r.ok) throw new Error("Sesión expirada. Inicia sesión nuevamente.");
   const data = await r.json().catch(() => ({}));
   const jwt = extractJWT(data);
   if (!jwt) throw new Error("Token inválido recibido de /api/auth/token");
   return jwt;
 }
 
+/** ==================== Fetch servicios + cursos ==================== */
 async function getServices(): Promise<any[]> {
   const jwt = await getBackendJWTViaApiRoute();
   const base =
     process.env.NEXT_PUBLIC_URL?.replace(/\/+$/, "") ?? "http://localhost:8080";
 
-  const res = await fetch(`${base}/services/byUser`, {
+  // 1) Servicios del usuario
+  const resServices = await fetch(`${base}/services/byUser`, {
     headers: { Authorization: `Bearer ${jwt}` },
     cache: "no-store",
   });
 
-  // Manejo robusto de estados
-  if (!res.ok) {
-    // 400 => “No hay servicios registrados” en el backend → tratamos como lista vacía
-    if (res.status === 400) {
-      return [];
+  let servicesList: any[] = [];
+  if (resServices.ok) {
+    try {
+      const list = await resServices.json();
+      servicesList = Array.isArray(list) ? list : [];
+    } catch {
+      servicesList = [];
     }
-    // Otros errores sí se propagan
-    const text = await res.text().catch(() => "");
+  } else if (resServices.status !== 400) {
+    const text = await resServices.text().catch(() => "");
     try {
       const j = JSON.parse(text);
-      throw new Error(j?.message || j?.error || text || `Error ${res.status}`);
+      throw new Error(
+        j?.message || j?.error || text || `Error ${resServices.status}`
+      );
     } catch {
-      throw new Error(text || `Error ${res.status}`);
+      throw new Error(text || `Error ${resServices.status}`);
     }
   }
 
-  // Si es OK, parseamos y normalizamos claves opcionales para no romper el render
+  // 2) Cursos inscritos del usuario (sin romper si no existe)
+  let coursesList: any[] = [];
   try {
-    const list = await res.json();
-    if (!Array.isArray(list)) return [];
-    return list.map((s: any) => ({
-      ...s,
-      // Normalizaciones por si vienen con otros nombres en el futuro:
-      exp_date: s?.exp_date ?? s?.expDate ?? s?.expirationDate ?? null,
-      assurance: s?.assurance ?? s?.insurer ?? s?.provider ?? null,
-      duration: s?.duration ?? s?.months ?? s?.term ?? null,
-      status: s?.status ?? s?.state ?? null,
-      // ⬇️ NUEVO: intentos comunes para precio
-      price: Number(
-        s?.price ??
-          s?.amount ??
-          s?.total ??
-          s?.totalAmount ??
-          s?.value ??
-          s?.cost ??
-          0
-      ),
-    }));
+    const resCourses = await fetch(`${base}/usr/courseByUser`, {
+      headers: { Authorization: `Bearer ${jwt}` },
+      cache: "no-store",
+    });
+    if (resCourses.ok) {
+      const raw = await resCourses.json().catch(() => []);
+      coursesList = Array.isArray(raw)
+        ? raw
+        : Array.isArray((raw as any)?.content)
+        ? (raw as any).content
+        : [];
+    }
   } catch {
-    return [];
+    coursesList = [];
   }
+
+  // 3) Normalizar servicios
+  const services = servicesList.map((s: any) => ({
+    ...s,
+    exp_date: s?.exp_date ?? s?.expDate ?? s?.expirationDate ?? null,
+    assurance: s?.assurance ?? s?.insurer ?? s?.provider ?? null,
+    duration: s?.duration ?? s?.months ?? s?.term ?? null,
+    status: s?.status ?? s?.state ?? null,
+    price: Number(
+      s?.price ??
+        s?.amount ??
+        s?.total ??
+        s?.totalAmount ??
+        s?.value ??
+        s?.cost ??
+        0
+    ),
+    isCourseOnly: false,
+  }));
+
+  // 4) Normalizar cursos como “pseudo-servicio”
+  const courseRows = coursesList.map((c: any) => ({
+    id: `course-${(c?.id ?? c?.courseId ?? "") || cryptoRandomId()}`, // evitar colisión
+    courseId: c?.id ?? c?.courseId ?? null,
+    serviceType: c?.type ?? c?.courseType ?? "COURSE",
+    plate: "-", // no aplica
+    status: c?.status ?? c?.state ?? "INSCRITO",
+    price: Number(c?.price ?? c?.amount ?? 0),
+    exp_date: null,
+    assurance: null,
+    duration: c?.duration ?? c?.months ?? null,
+    graduated: c?.graduated ?? false,
+    isCourseOnly: true,
+    courseName: c?.name ?? c?.courseName ?? null,
+  }));
+
+  // 5) Mezclar con deduplicación:
+  //    si ya existe un servicio real (COURSE/COURSES) para el mismo tipo (A1/B1/B3...),
+  //    ocultamos el pseudo-curso correspondiente.
+  const existingCourseTypes = new Set<string>();
+  for (const s of services) {
+    const isCourseService = String(s?.serviceType ?? "")
+      .toUpperCase()
+      .startsWith("COURSE");
+    if (isCourseService) {
+      const t =
+        normalizeCourseType(s?.courseType) ||
+        normalizeCourseType(s?.serviceType) ||
+        normalizeCourseType(s?.name);
+      if (t) existingCourseTypes.add(t);
+    }
+  }
+
+  const filteredCourseRows = courseRows.filter((c: any) => {
+    const t =
+      normalizeCourseType(c?.serviceType) ||
+      normalizeCourseType(c?.courseName) ||
+      normalizeCourseType(c?.type);
+    return t ? !existingCourseTypes.has(t) : true;
+  });
+
+  // (opcional) si quieres que queden ordenados por ID desc:
+  // const result = [...services, ...filteredCourseRows].sort((a,b)=>Number(b?.id??0)-Number(a?.id??0));
+  // return result;
+
+  return [...services, ...filteredCourseRows];
 }
 
+// util local para id aleatorio
+function cryptoRandomId() {
+  try {
+    // @ts-ignore
+    if (typeof crypto !== "undefined" && crypto.randomUUID)
+      return crypto.randomUUID();
+  } catch {}
+  return `rnd-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/** ==================== UI helpers ==================== */
+function statusPillClass(status: string | null) {
+  const s = String(status ?? "").toUpperCase();
+  if (["CANCELLED", "CANCELED"].includes(s))
+    return "border-red-300 text-red-700 bg-red-50";
+  if (["COMPLETED", "FINISHED"].includes(s))
+    return "border-green-300 text-green-700 bg-green-50";
+  if (["PENDING", "CREATED", "EN_PROCESO", "SOLICITADO"].includes(s))
+    return "border-amber-300 text-amber-700 bg-amber-50";
+  return "border-slate-300 text-slate-700 bg-slate-50";
+}
+
+/** ==================== Page ==================== */
 export default async function ServicesListPage() {
   let services: any[] = [];
   let error: string | null = null;
@@ -138,21 +239,36 @@ export default async function ServicesListPage() {
       </div>
 
       {error ? (
-        <p>{error}</p>
+        <>
+          {console.error("Servicios | Error:", error)}
+          <p>No pudimos cargar tus servicios. Intenta nuevamente.</p>
+        </>
       ) : services.length === 0 ? (
         <p>No hay servicios todavía.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-[960px] w-full border-separate border-spacing-0 rounded-xl overflow-hidden">
-            <thead>
-              <tr className="bg-black/5 text-left">
-                <th className="py-3 pl-4 pr-3 text-sm font-semibold">ID</th>
-                <th className="py-3 px-3 text-sm font-semibold">Tipo</th>
-                <th className="py-3 px-3 text-sm font-semibold">Placa</th>
-                <th className="py-3 px-3 text-sm font-semibold">Estado</th>
-                <th className="py-3 px-3 text-sm font-semibold">Precio</th>
-                <th className="py-3 px-3 text-sm font-semibold">Detalle</th>
-                <th className="py-3 pr-4 pl-3 text-sm font-semibold text-right">
+        <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <table className="min-w-[960px] w-full text-sm border-separate border-spacing-0">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="py-3 pl-4 pr-3 text-left font-semibold border-b border-slate-200">
+                  ID
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Tipo
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Placa
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Estado
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Precio
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Detalle
+                </th>
+                <th className="py-3 pr-4 pl-3 text-right font-semibold border-b border-slate-200">
                   Acciones
                 </th>
               </tr>
@@ -160,81 +276,86 @@ export default async function ServicesListPage() {
 
             <tbody>
               {services.map((s: any, idx: number) => {
-                const status = String(s.status ?? "").toUpperCase();
-                const pill =
-                  status === "CANCELLED" || status === "CANCELED"
-                    ? "border-red-300 text-red-700 bg-red-50"
-                    : status === "COMPLETED" || status === "FINISHED"
-                    ? "border-green-300 text-green-700 bg-green-50"
-                    : status === "PENDING" ||
-                      status === "CREATED" ||
-                      status === "EN_PROCESO" ||
-                      status === "SOLICITADO"
-                    ? "border-amber-300 text-amber-700 bg-amber-50"
-                    : "border-slate-300 text-slate-700 bg-slate-50";
+                const pill = statusPillClass(s.status);
 
                 return (
                   <tr
                     key={s.id}
-                    className={idx % 2 ? "bg-white" : "bg-slate-50/60"}
+                    className="border-b border-slate-100 odd:bg-white even:bg-slate-50/60 hover:bg-indigo-50/40 transition-colors"
                   >
-                    {/* ID */}
-                    <td className="py-3 pl-4 pr-3 text-sm">{s.id}</td>
+                    <td className="py-3 pl-4 pr-3">{s.id}</td>
 
-                    {/* Tipo */}
-                    <td className="py-3 px-3 text-sm">
+                    <td className="py-3 px-3">
                       {s.serviceType ?? "-"}
+                      {s.isCourseOnly && (
+                        <span className="ml-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] text-slate-600">
+                          CURSO
+                        </span>
+                      )}
                     </td>
 
-                    {/* Placa */}
-                    <td className="py-3 px-3 text-sm">{s.plate ?? "-"}</td>
+                    <td className="py-3 px-3">{s.plate ?? "-"}</td>
 
-                    {/* Estado */}
-                    <td className="py-3 px-3 text-sm">
+                    <td className="py-3 px-3">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${
-                          String(s.status ?? "").toUpperCase() ===
-                            "CANCELLED" ||
-                          String(s.status ?? "").toUpperCase() === "CANCELED"
-                            ? "border-red-300 text-red-700 bg-red-50"
-                            : String(s.status ?? "").toUpperCase() ===
-                                "COMPLETED" ||
-                              String(s.status ?? "").toUpperCase() ===
-                                "FINISHED"
-                            ? "border-green-300 text-green-700 bg-green-50"
-                            : [
-                                "PENDING",
-                                "CREATED",
-                                "EN_PROCESO",
-                                "SOLICITADO",
-                              ].includes(String(s.status ?? "").toUpperCase())
-                            ? "border-amber-300 text-amber-700 bg-amber-50"
-                            : "border-slate-300 text-slate-700 bg-slate-50"
-                        }`}
+                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${pill}`}
                       >
-                        {s.status ?? "-"}
+                        {s.status ?? (s.isCourseOnly ? "INSCRITO" : "-")}
                       </span>
                     </td>
 
-                    {/* Precio */}
-                    <td className="py-3 px-3 text-sm font-medium">
-                      {formatCOP(s.price)}
+                    <td className="py-3 px-3 font-medium">
+                      {s.isCourseOnly
+                        ? s.price > 0
+                          ? formatCOP(s.price)
+                          : "—"
+                        : formatCOP(s.price)}
                     </td>
 
-                    {/* Detalle */}
-                    <td className="py-3 px-3 text-sm">
-                      <Link href={`/client/services/${s.id}`}>
-                        <button className="rounded-lg border px-3 py-1.5 text-xs hover:bg-black/5 transition">
-                          Ver
-                        </button>
-                      </Link>
+                    <td className="py-3 px-3">
+                      {s.isCourseOnly ? (
+                        <div className="text-slate-700">
+                          {s.courseName ? (
+                            <span className="font-medium">{s.courseName}</span>
+                          ) : (
+                            <span>Curso</span>
+                          )}
+                          {/* Si tienes detalle de cursos:
+                          <Link href={`/client/courses/${s.courseId}`}>
+                            <button className="ml-2 rounded-lg border px-3 py-1.5 text-xs hover:bg-black/5 transition">
+                              Ver curso
+                            </button>
+                          </Link>
+                          */}
+                        </div>
+                      ) : (
+                        <Link href={`/client/services/${s.id}`}>
+                          <button className="rounded-lg border px-3 py-1.5 text-xs hover:bg-black/5 transition">
+                            Ver
+                          </button>
+                        </Link>
+                      )}
                     </td>
 
-                    {/* Acciones */}
-                    <td className="py-3 pr-4 pl-3 text-sm">
+                    <td className="py-3 pr-4 pl-3">
                       <div className="flex items-center justify-end gap-2">
-                        <ServicePayButton serviceId={Number(s.id)} />
-                        <ServiceCancelButton service={s} />
+                        {s.isCourseOnly ? (
+                          /* Pago para cursos (sin serviceId): pasamos courseId, courseType y price */
+                          <ServicePayButton
+                            course={{
+                              id: s.courseId, // viene del normalizador de cursos
+                              type: s.serviceType || s.courseType, // A1, B3, etc.
+                              price: s.price, // si tu backend lo usa al crear el service
+                            }}
+                            label="Pagar"
+                          />
+                        ) : (
+                          <>
+                            {/* Pago normal para servicios con id */}
+                            <ServicePayButton serviceId={Number(s.id)} />
+                            <ServiceCancelButton service={s} />
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

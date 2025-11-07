@@ -10,6 +10,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import s from "./Header.module.css";
+import PaymentsMenu from "@/components/PaymentsMenu";
+
 
 const nav = [
   { href: "/client", label: "Inicio" },
