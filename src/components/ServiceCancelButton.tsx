@@ -62,12 +62,27 @@ export default function ServiceCancelButton({
       });
       const txt = await r.text();
       let j: any = {};
-      try { j = JSON.parse(txt); } catch {}
-      if (!r.ok) throw new Error(j?.message || txt || "No se pudo cancelar el servicio.");
+      try {
+        j = JSON.parse(txt);
+      } catch {}
+
+      if (!r.ok || j?.ok === false) {
+        const msg = j?.message || txt || "No se pudo cancelar el servicio.";
+        setErrorMsg(msg);
+        // 🔔 ALERT de error
+        alert(msg);
+        return;
+      }
+
+      // 🔔 ALERT de éxito
+      alert(j?.message || "Servicio cancelado correctamente.");
       setOpen(false);
-      router.refresh();
+      router.refresh(); // oculta botones tras actualizar estado
     } catch (e: any) {
-      setErrorMsg(e?.message || "Error al cancelar servicio.");
+      const msg = e?.message || "Error al cancelar servicio.";
+      setErrorMsg(msg);
+      // 🔔 ALERT de error
+      alert(msg);
     } finally {
       setLoading(false);
     }
@@ -78,6 +93,9 @@ export default function ServiceCancelButton({
       className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30"
       role="dialog"
       aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !loading) setOpen(false);
+      }}
     >
       <div className="w-[min(92vw,520px)] rounded-xl bg-white p-4 shadow-xl border">
         <div className="mb-3">
@@ -122,11 +140,12 @@ export default function ServiceCancelButton({
         className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs border bg-white hover:bg-black/5 transition"
         onClick={() => setOpen(true)}
         disabled={loading}
+        title="Cancelar servicio"
       >
         {label}
       </button>
 
-      {/* 🔧 FIX: Solo portalizar cuando `open` esté en true */}
+      {/* Portal solo cuando el modal esté abierto */}
       {mounted && open ? createPortal(modal, document.body) : null}
     </>
   );
