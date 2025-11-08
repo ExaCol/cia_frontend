@@ -10,6 +10,8 @@ import "@/styles/globals.css";
 import ServiceCancelButton from "@/components/ServiceCancelButton";
 import ServicePayButton from "@/components/ServicePayButton";
 import { formatCOP } from "@/lib/format";
+import AutoRefreshOnFocus from "@/components/AutoRefreshOnFocus";
+
 
 /** ==================== Helpers Auth ==================== */
 function extractJWT(anyVal: any): string | null {
@@ -185,6 +187,7 @@ export default async function ServicesListPage() {
 
   return (
     <div className="space-y-6">
+      <AutoRefreshOnFocus />
       <div className="flex items-center justify-between">
         <h2>Mis servicios</h2>
         <div className="flex gap-2">
