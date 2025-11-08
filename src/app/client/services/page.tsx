@@ -1,7 +1,7 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 2.2
-Client Services List (sin columna Detalle)
+Version 2.3
+Client Services 
 */
 
 import Link from "next/link";
@@ -11,7 +11,6 @@ import ServiceCancelButton from "@/components/ServiceCancelButton";
 import ServicePayButton from "@/components/ServicePayButton";
 import { formatCOP } from "@/lib/format";
 import AutoRefreshOnFocus from "@/components/AutoRefreshOnFocus";
-
 
 /** ==================== Helpers Auth ==================== */
 function extractJWT(anyVal: any): string | null {
@@ -106,6 +105,8 @@ async function getServices(): Promise<any[]> {
     price: Number(
       s?.price ?? s?.amount ?? s?.total ?? s?.totalAmount ?? s?.value ?? s?.cost ?? 0
     ),
+    paid: Boolean(s?.paid ?? s?.isPaid ?? (String(s?.status).toUpperCase().trim() === "PAID")),
+    graduated: Boolean(s?.graduated),
     isCourseOnly: false,
   }));
 
@@ -120,7 +121,8 @@ async function getServices(): Promise<any[]> {
     exp_date: null,
     assurance: null,
     duration: c?.duration ?? c?.months ?? null,
-    graduated: c?.graduated ?? false,
+    graduated: Boolean(c?.graduated),
+    paid: Boolean(c?.paid),
     isCourseOnly: true,
     courseName: c?.name ?? c?.courseName ?? null,
   }));
@@ -159,6 +161,7 @@ function cryptoRandomId() {
 
 // ======== lógica de botones ========
 function canPay(row: any) {
+  if (row?.paid === true) return false; // respeta paid
   if (row?.isCourseOnly) return true;
   const s = String(row?.status ?? "").toUpperCase().trim();
   const closed = ["COMPLETED", "FINISHED", "PAID", "PAID_OUT", "CANCELLED", "CANCELED", "CANCELADO"];
@@ -167,6 +170,7 @@ function canPay(row: any) {
 }
 
 function canCancel(row: any) {
+  if (row?.paid === true) return false; // respeta paid
   if (row?.isCourseOnly) return false;
   const s = String(row?.status ?? "").toUpperCase().trim();
   const closed = ["COMPLETED", "FINISHED", "PAID", "PAID_OUT", "CANCELLED", "CANCELED", "CANCELADO"];
@@ -233,7 +237,7 @@ export default async function ServicesListPage() {
                     )}
                   </td>
 
-                  <td className="py-3 px-3">{s.plate ?? "-"}</td>
+                  <td className="py-3 px-3">{s.plate || "-"}</td>
 
                   <td className="py-3 px-3 font-medium">
                     {s.isCourseOnly ? (s.price > 0 ? formatCOP(s.price) : "—") : formatCOP(s.price)}
@@ -242,7 +246,7 @@ export default async function ServicesListPage() {
                   <td className="py-3 pr-4 pl-3">
                     <div className="flex items-center justify-end gap-2">
                       {/* PAGAR */}
-                      {canPay(s) &&
+                      {!s.paid && canPay(s) &&
                         (s.isCourseOnly ? (
                           <ServicePayButton
                             course={{
@@ -257,7 +261,7 @@ export default async function ServicesListPage() {
                         ))}
 
                       {/* CANCELAR */}
-                      {canCancel(s) && <ServiceCancelButton service={s} />}
+                      {!s.paid && canCancel(s) && <ServiceCancelButton service={s} />}
                     </div>
                   </td>
                 </tr>
