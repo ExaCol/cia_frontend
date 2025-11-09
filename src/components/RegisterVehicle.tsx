@@ -106,7 +106,7 @@ function RegisterVehicle() {
           })
           .then((res) => {
             alert("Vehículo registrado exitosamente");
-            router.push("/");
+            router.push("/client/profile");
           })
           .catch((err) => {
             console.error("Error al registrar el vehículo:", err);
@@ -157,9 +157,9 @@ function RegisterVehicle() {
       <select id="type" name="type" defaultValue="Automovil" required>
         <option value="Motos">Moto</option>
         <option value="Liviano Particular">Liviano Particular</option>
-        <option value="Liviano Privado">Liviano Privado</option>
+        <option value="Liviano Publico">Liviano Público</option>
         <option value="Pesado Particular">Pesado Particular</option>
-        <option value="Pesado Privado">Pesado Privado</option>
+        <option value="Pesado Publico">Pesado Público</option>
       </select>
 
       <label htmlFor="model">Modelo (año)</label>
