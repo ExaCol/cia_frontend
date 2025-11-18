@@ -1,0 +1,33 @@
+.page {
+  max-width: 960px;
+  margin: 24px auto 40px; 
+  padding: 0 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;   
+  background: #ffffff;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}

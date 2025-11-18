@@ -6,6 +6,7 @@
 
 import { cookies } from "next/headers";
 import { formatCOP } from "@/lib/format";
+import s from "./PaymentsPage.module.css";
 
 /* ============ Auth helpers ============ */
 function extractJWT(anyVal: any): string | null {
@@ -151,26 +152,42 @@ export default async function PaymentsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h2>Pagos</h2>
+    <div className={s.page}>
+      <h2 className={s.title}>Pagos</h2>
 
       {error ? (
         <p>{error}</p>
       ) : rows.length === 0 ? (
         <p>No hay pagos registrados.</p>
       ) : (
-        <div className="overflow-x-auto border border-slate-200 rounded-xl">
+        <div className={s.tableWrapper}>
           <table className="w-full text-sm border-separate border-spacing-0">
             <thead className="bg-slate-50">
               <tr>
-                <th className="py-3 pl-4 pr-3 text-left font-semibold border-b border-slate-200">ID</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Servicio</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Monto</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Estado</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Fecha</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Ref. externa</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">MP Payment ID</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">MP Detalle</th>
+                <th className="py-3 pl-4 pr-3 text-left font-semibold border-b border-slate-200">
+                  ID
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Servicio
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Monto
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Estado
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Fecha
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Ref. externa
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  MP Payment ID
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  MP Detalle
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -183,15 +200,23 @@ export default async function PaymentsPage() {
                     className="border-b border-slate-100 odd:bg-white even:bg-slate-50/60 hover:bg-indigo-50/40 transition-colors"
                   >
                     <td className="py-3 pl-4 pr-3">{p.id}</td>
-                    <td className="py-3 px-3">{p.serviceId ? `Servicio #${p.serviceId}` : "—"}</td>
-                    <td className="py-3 px-3 font-medium">{formatCOP(p.amount)}</td>
                     <td className="py-3 px-3">
-                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${cls}`}>
+                      {p.serviceId ? `Servicio #${p.serviceId}` : "—"}
+                    </td>
+                    <td className="py-3 px-3 font-medium">
+                      {formatCOP(p.amount)}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span
+                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${cls}`}
+                      >
                         {label}
                       </span>
                     </td>
                     <td className="py-3 px-3">{fmtDateISO(p.releaseDate)}</td>
-                    <td className="py-3 px-3">{p.externalReference ?? "—"}</td>
+                    <td className="py-3 px-3">
+                      {p.externalReference ?? "—"}
+                    </td>
                     <td className="py-3 px-3">{p.mpPaymentId ?? "—"}</td>
                     <td className="py-3 px-3">{p.mpStatusDetail ?? "—"}</td>
                   </tr>

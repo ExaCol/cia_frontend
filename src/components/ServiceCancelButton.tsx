@@ -57,9 +57,12 @@ export default function ServiceCancelButton({
     setErrorMsg(null);
     setLoading(true);
     try {
-      const r = await fetch(`/api/services/cancel?id=${encodeURIComponent(String(id))}`, {
-        method: "POST",
-      });
+      const r = await fetch(
+        `/api/services/cancel?id=${encodeURIComponent(String(id))}`,
+        {
+          method: "POST",
+        }
+      );
       const txt = await r.text();
       let j: any = {};
       try {
@@ -69,19 +72,16 @@ export default function ServiceCancelButton({
       if (!r.ok || j?.ok === false) {
         const msg = j?.message || txt || "No se pudo cancelar el servicio.";
         setErrorMsg(msg);
-        // 🔔 ALERT de error
         alert(msg);
         return;
       }
 
-      // 🔔 ALERT de éxito
       alert(j?.message || "Servicio cancelado correctamente.");
       setOpen(false);
-      router.refresh(); // oculta botones tras actualizar estado
+      router.refresh();
     } catch (e: any) {
       const msg = e?.message || "Error al cancelar servicio.";
       setErrorMsg(msg);
-      // 🔔 ALERT de error
       alert(msg);
     } finally {
       setLoading(false);
@@ -90,36 +90,100 @@ export default function ServiceCancelButton({
 
   const modal = (
     <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30"
       role="dialog"
       aria-modal="true"
+      // overlay oscuro que cubre toda la pantalla
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        backgroundColor: "rgba(0,0,0,0.35)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
       onClick={(e) => {
-        if (e.target === e.currentTarget && !loading) setOpen(false);
+        if (e.target === e.currentTarget && !loading) {
+          setOpen(false);
+          setErrorMsg(null);
+        }
       }}
     >
-      <div className="w-[min(92vw,520px)] rounded-xl bg-white p-4 shadow-xl border">
-        <div className="mb-3">
-          <h3 className="text-base font-semibold">Confirmar cancelación</h3>
-          <p className="text-sm opacity-80">
+      {/* Caja del modal */}
+      <div
+        style={{
+          width: "min(520px, 92vw)",
+          backgroundColor: "#ffffff",
+          borderRadius: 16,
+          padding: 16,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          border: "1px solid #e5e7eb",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ marginBottom: 12 }}>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          >
+            Confirmar cancelación
+          </h3>
+          <p
+            style={{
+              margin: "6px 0 0",
+              fontSize: 14,
+              opacity: 0.85,
+            }}
+          >
             Vas a cancelar el servicio <b>{humanType}</b>
-            {humanPlate ? <> de la placa <b>{humanPlate}</b></> : null}.
+            {humanPlate ? (
+              <>
+                {" "}
+                de la placa <b>{humanPlate}</b>
+              </>
+            ) : null}
+            .
           </p>
         </div>
 
         {errorMsg && (
-          <div className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800 mb-3">
+          <div
+            style={{
+              marginBottom: 10,
+              padding: "6px 8px",
+              borderRadius: 8,
+              border: "1px solid #fecaca",
+              backgroundColor: "#fef2f2",
+              color: "#b91c1c",
+              fontSize: 13,
+            }}
+          >
             {errorMsg}
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-2">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+            marginTop: 4,
+          }}
+        >
           <button
             className="px-3 py-1.5 text-sm border rounded-lg hover:bg-black/5 transition"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              setErrorMsg(null);
+            }}
             disabled={loading}
           >
             {errorMsg ? "Cerrar" : "No"}
           </button>
+
           {!errorMsg && (
             <button
               className="px-3 py-1.5 text-sm border rounded-lg hover:bg-black/5 transition"
@@ -145,7 +209,6 @@ export default function ServiceCancelButton({
         {label}
       </button>
 
-      {/* Portal solo cuando el modal esté abierto */}
       {mounted && open ? createPortal(modal, document.body) : null}
     </>
   );

@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import s from "./Header.module.css";
 import PaymentsMenu from "@/components/PaymentsMenu";
-
+import Image from "next/image";
 
 const nav = [
   { href: "/client", label: "Inicio" },
@@ -41,10 +41,20 @@ export default function Header() {
   return (
     <header className={s.header}>
       <div className={`container ${s.row}`}>
-        <Link href="/client" className={s.logo}>
-          SmartTraffic
+        <Link
+          href="/client"
+          className={s.logo}
+          aria-label="Volver al inicio de SmartTraffic"
+        >
+          <Image
+            src="/smarttraffic-logo.png"
+            alt="SmartTraffic"
+            width={72} // era más pequeño
+            height={72}
+            className={s.logoImg}
+            priority
+          />
         </Link>
-
         <nav className={s.desktopNav} aria-label="Principal">
           {nav.map(({ href, label }) => (
             <Link
@@ -63,7 +73,7 @@ export default function Header() {
           aria-label="Abrir menú"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          onClick={() => setOpen(v => !v)}
+          onClick={() => setOpen((v) => !v)}
         >
           <span className={s.bar} />
           <span className={s.bar} />
@@ -86,7 +96,6 @@ export default function Header() {
           </Link>
         ))}
       </nav>
-      <hr></hr>
     </header>
   );
 }

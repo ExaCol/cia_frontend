@@ -1,0 +1,94 @@
+.page {
+  max-width: 960px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Encabezado */
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+/* Tarjetas */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+/* Encabezado de la sección derecha */
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.sectionText {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 12px;
+}
+
+/* Botones de acción */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.dangerButton {
+  background-color: #dc2626;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 14px;
+  border: 1px solid #991b1b;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.dangerButton:hover {
+  background-color: #b91c1c;
+  transform: scale(1.02);
+}
+
+/* Separación del perfil embebido */
+.profileWrapper {
+  margin-top: 8px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .actions {
+    align-items: stretch;
+  }
+
+  .dangerButton {
+    width: 100%;
+    text-align: center;
+  }
+}

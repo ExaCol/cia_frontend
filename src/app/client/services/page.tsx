@@ -11,6 +11,7 @@ import ServiceCancelButton from "@/components/ServiceCancelButton";
 import ServicePayButton from "@/components/ServicePayButton";
 import { formatCOP } from "@/lib/format";
 import AutoRefreshOnFocus from "@/components/AutoRefreshOnFocus";
+import s from "./ServicesPage.module.css";
 
 /** ==================== Helpers Auth ==================== */
 function extractJWT(anyVal: any): string | null {
@@ -190,11 +191,13 @@ export default async function ServicesListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={s.page}>
       <AutoRefreshOnFocus />
-      <div className="flex items-center justify-between">
-        <h2>Mis servicios</h2>
-        <div className="flex gap-2">
+
+      <div className={s.headerRow}>
+        <h2 className={s.title}>Mis servicios</h2>
+
+        <div className={s.actions}>
           <Link href="/client/services/new">
             <button className="inline-flex items-center rounded-lg px-4 py-2 text-sm border hover:bg-black/5 transition">
               Solicitar servicio
@@ -208,15 +211,25 @@ export default async function ServicesListPage() {
       ) : services.length === 0 ? (
         <p>No hay servicios todavía.</p>
       ) : (
-        <div className="overflow-x-auto border border-slate-200 rounded-xl">
+        <div className={s.tableWrapper}>
           <table className="min-w-[760px] w-full text-sm border-separate border-spacing-0">
             <thead className="bg-slate-50">
               <tr>
-                <th className="py-3 pl-4 pr-3 text-left font-semibold border-b border-slate-200">ID</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Tipo</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Placa</th>
-                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">Precio</th>
-                <th className="py-3 pr-4 pl-3 text-right font-semibold border-b border-slate-200">Acciones</th>
+                <th className="py-3 pl-4 pr-3 text-left font-semibold border-b border-slate-200">
+                  ID
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Tipo
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Placa
+                </th>
+                <th className="py-3 px-3 text-left font-semibold border-b border-slate-200">
+                  Precio
+                </th>
+                <th className="py-3 pr-4 pl-3 text-right font-semibold border-b border-slate-200">
+                  Acciones
+                </th>
               </tr>
             </thead>
 
@@ -240,13 +253,18 @@ export default async function ServicesListPage() {
                   <td className="py-3 px-3">{s.plate || "-"}</td>
 
                   <td className="py-3 px-3 font-medium">
-                    {s.isCourseOnly ? (s.price > 0 ? formatCOP(s.price) : "—") : formatCOP(s.price)}
+                    {s.isCourseOnly
+                      ? s.price > 0
+                        ? formatCOP(s.price)
+                        : "—"
+                      : formatCOP(s.price)}
                   </td>
 
                   <td className="py-3 pr-4 pl-3">
                     <div className="flex items-center justify-end gap-2">
                       {/* PAGAR */}
-                      {!s.paid && canPay(s) &&
+                      {!s.paid &&
+                        canPay(s) &&
                         (s.isCourseOnly ? (
                           <ServicePayButton
                             course={{
@@ -261,7 +279,9 @@ export default async function ServicesListPage() {
                         ))}
 
                       {/* CANCELAR */}
-                      {!s.paid && canCancel(s) && <ServiceCancelButton service={s} />}
+                      {!s.paid && canCancel(s) && (
+                        <ServiceCancelButton service={s} />
+                      )}
                     </div>
                   </td>
                 </tr>
