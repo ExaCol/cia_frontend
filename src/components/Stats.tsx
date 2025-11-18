@@ -207,8 +207,7 @@ export default function Stats() {
 
         <form onSubmit={handleSubmitCat}>
           <label htmlFor="type">Categoría</label>
-          <select id="type" name="type" defaultValue="SIMIT" required>
-            <option value="SIMIT">SIMIT</option>
+          <select id="type" name="type" defaultValue="COURSE" required>
             <option value="COURSE">Curso de Conducción</option>
             <option value="TECNO">Tecnomecánica</option>
             <option value="SOAT">SOAT</option>
