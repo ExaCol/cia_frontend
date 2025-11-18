@@ -3,11 +3,12 @@
 import "@/styles/globals.css";
 import axios from "axios";
 import React from "react";
+import s from "./WorkerCoursesPage.module.css";
 
 const url = process.env.NEXT_PUBLIC_URL;
 const COURSES_ENDPOINT = "/coursesData/getAllCourses";
 const GET_USERS_BY_COURSE = "/coursesData/getUsrByCourse"; // + /:courseId
-const UNROLL_ENDPOINT = "/coursesData/unroll";             // + /:userId/:courseId
+const UNROLL_ENDPOINT = "/coursesData/unroll"; // + /:userId/:courseId
 
 // ===== Tipos =====
 export type Course = {
@@ -44,12 +45,18 @@ export default function Courses() {
 
   // Ver inscritos / desinscribir
   const [expandedCourseId, setExpandedCourseId] = React.useState<number | string | null>(null);
-  const [loadingUsersCourseId, setLoadingUsersCourseId] = React.useState<number | string | null>(null);
+  const [loadingUsersCourseId, setLoadingUsersCourseId] = React.useState<number | string | null>(
+    null
+  );
   const [usersByCourse, setUsersByCourse] = React.useState<Record<string | number, Usr[]>>({});
   const [unrollingKey, setUnrollingKey] = React.useState<string | null>(null); // `${courseId}:${userId}`
 
   const formatCOP = (n: number) =>
-    new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
+    new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0,
+    }).format(n);
 
   async function getToken(): Promise<string> {
     const tokenResp = await axios.get("/api/auth/token");
@@ -58,13 +65,15 @@ export default function Courses() {
 
   function mapUsr(raw: any): Usr {
     const id = raw?.id ?? raw?.userId ?? raw?.idusuario ?? raw?.usrId ?? raw?.idUsr;
-    const fallbackParts = [
-      raw?.firstName ?? raw?.nombre1,
-      raw?.lastName ?? raw?.apellido1,
-    ].filter((v: any) => typeof v === "string" && v.trim() !== "") as string[];
+    const fallbackParts = [raw?.firstName ?? raw?.nombre1, raw?.lastName ?? raw?.apellido1].filter(
+      (v: any) => typeof v === "string" && v.trim() !== ""
+    ) as string[];
     const nameCandidate =
-      raw?.name ?? raw?.nombre ?? (fallbackParts.length ? fallbackParts.join(" ") : undefined);
-    const email = raw?.email ?? raw?.correo ?? raw?.mail ?? raw?.emailAddress ?? undefined;
+      raw?.name ??
+      raw?.nombre ??
+      (fallbackParts.length ? fallbackParts.join(" ") : undefined);
+    const email =
+      raw?.email ?? raw?.correo ?? raw?.mail ?? raw?.emailAddress ?? undefined;
 
     return {
       id: id ?? "NA",
@@ -89,7 +98,7 @@ export default function Courses() {
       });
       const rows: Course[] = Array.isArray(coursesResp.data)
         ? coursesResp.data
-        : (coursesResp.data?.courses ?? coursesResp.data?.data ?? []);
+        : coursesResp.data?.courses ?? coursesResp.data?.data ?? [];
       setCourses(rows ?? []);
     } catch (e: any) {
       if (axios.isAxiosError(e) && e.response?.status === 401) {
@@ -129,14 +138,22 @@ export default function Courses() {
       setFindingUser(true);
       const token = await getToken();
 
-      const userResp = await axios.get(`${url}/usr/userbyemail/${encodeURIComponent(email)}`, {
-        headers: { authorization: `Bearer ${token}` },
-      });
+      const userResp = await axios.get(
+        `${url}/usr/userbyemail/${encodeURIComponent(email)}`,
+        {
+          headers: { authorization: `Bearer ${token}` },
+        }
+      );
 
       if (userResp.status === 200) {
-        const uid = userResp.data?.id ?? userResp.data?.userId ?? userResp.data?.idusuario;
+        const uid =
+          userResp.data?.id ??
+          userResp.data?.userId ??
+          userResp.data?.idusuario;
         if (uid == null) {
-          setError("No se pudo determinar el ID del usuario en la respuesta.");
+          setError(
+            "No se pudo determinar el ID del usuario en la respuesta."
+          );
           return;
         }
         setUserId(uid);
@@ -166,8 +183,11 @@ export default function Courses() {
     }
   };
 
-  // ===== Inscripción (igual que antes) =====
-  const handleEnroll = async (courseId: number | string | undefined, courseName: string) => {
+  // ===== Inscripción =====
+  const handleEnroll = async (
+    courseId: number | string | undefined,
+    courseName: string
+  ) => {
     setSuccessEnrollMsg(null);
     setError(null);
 
@@ -184,21 +204,32 @@ export default function Courses() {
       setEnrollingId(courseId);
       const token = await getToken();
 
-      const resp = await axios.post(`${url}/coursesData/enroll/${userId}/${courseId}`, null, {
-        headers: { authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
+      const resp = await axios.post(
+        `${url}/coursesData/enroll/${userId}/${courseId}`,
+        null,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (resp.status >= 200 && resp.status < 300) {
         setSuccessEnrollMsg(`Inscripción exitosa en "${courseName}"`);
         // refrescar inscritos del curso abierto
         if (expandedCourseId === courseId) await fetchUsersByCourse(courseId);
         // actualizar cupo parcial en memoria (+1)
-        setCourses((prev) =>
-          prev?.map((c) =>
-            String(c.id) === String(courseId)
-              ? { ...c, parcialCapacity: Number(c.parcialCapacity) + 1 }
-              : c
-          ) ?? prev
+        setCourses(
+          (prev) =>
+            prev?.map((c) =>
+              String(c.id) === String(courseId)
+                ? {
+                    ...c,
+                    parcialCapacity: Number(c.parcialCapacity) + 1,
+                  }
+                : c
+            ) ?? prev
         );
       } else {
         setError(`No se pudo inscribir (status ${resp.status}).`);
@@ -217,7 +248,8 @@ export default function Courses() {
         setError(
           (typeof error.response.data === "string"
             ? error.response.data
-            : error.response.data?.message) || `Error ${error.response.status}`
+            : error.response.data?.message) ||
+            `Error ${error.response.status}`
         );
       } else {
         setError("Error de red al inscribir. Intenta nuevamente.");
@@ -233,11 +265,16 @@ export default function Courses() {
       setLoadingUsersCourseId(courseId);
       const token = await getToken();
 
-      const resp = await axios.get(`${url}${GET_USERS_BY_COURSE}/${courseId}`, {
-        headers: { authorization: `Bearer ${token}` },
-      });
+      const resp = await axios.get(
+        `${url}${GET_USERS_BY_COURSE}/${courseId}`,
+        {
+          headers: { authorization: `Bearer ${token}` },
+        }
+      );
 
-      const arr = Array.isArray(resp.data) ? resp.data : (resp.data?.data ?? []);
+      const arr = Array.isArray(resp.data)
+        ? resp.data
+        : resp.data?.data ?? [];
       const mapped: Usr[] = arr.map(mapUsr);
       setUsersByCourse((prev) => ({ ...prev, [courseId]: mapped }));
     } catch (e: any) {
@@ -256,7 +293,9 @@ export default function Courses() {
           return;
         }
         setError(
-          (typeof e.response.data === "string" ? e.response.data : e.response.data?.message) ||
+          (typeof e.response.data === "string"
+            ? e.response.data
+            : e.response.data?.message) ||
             `Error ${e.response.status} al cargar inscritos`
         );
       } else {
@@ -278,7 +317,8 @@ export default function Courses() {
 
   // ===== Desinscribir =====
   const handleUnroll = async (courseId: number | string, usrId: number | string) => {
-    if (!confirm(`¿Desinscribir al usuario #${usrId} del curso #${courseId}?`)) return;
+    if (!confirm(`¿Desinscribir al usuario #${usrId} del curso #${courseId}?`))
+      return;
 
     try {
       const key = `${courseId}:${usrId}`;
@@ -296,12 +336,19 @@ export default function Courses() {
         return { ...prev, [courseId]: next };
       });
 
-      setCourses((prev) =>
-        prev?.map((c) =>
-          String(c.id) === String(courseId)
-            ? { ...c, parcialCapacity: Math.max(0, Number(c.parcialCapacity) - 1) }
-            : c
-        ) ?? prev
+      setCourses(
+        (prev) =>
+          prev?.map((c) =>
+            String(c.id) === String(courseId)
+              ? {
+                  ...c,
+                  parcialCapacity: Math.max(
+                    0,
+                    Number(c.parcialCapacity) - 1
+                  ),
+                }
+              : c
+          ) ?? prev
       );
     } catch (e: any) {
       if (axios.isAxiosError(e) && e.response) {
@@ -315,7 +362,9 @@ export default function Courses() {
           return;
         }
         alert(
-          (typeof e.response.data === "string" ? e.response.data : e.response.data?.message) ||
+          (typeof e.response.data === "string"
+            ? e.response.data
+            : e.response.data?.message) ||
             `Error ${e.response.status} al desinscribir`
         );
       } else {
@@ -332,15 +381,20 @@ export default function Courses() {
       ? Math.max(0, c.capacity - c.parcialCapacity)
       : undefined;
 
+  // ⬇⬇⬇ AQUÍ EMPIEZA EL RETURN NUEVO ⬇⬇⬇
   return (
-    <main className="max-w-5xl mx-auto p-4">
-      <h1 className="text-xl font-semibold">Gestión de cursos</h1>
-      <p className="text-gray-600 text-sm mt-1">
-        Los cursos se cargan automáticamente. Puedes ver inscritos y desinscribir sin buscar email. Para inscribir, primero busca el usuario por email.
-      </p>
+    <div className={s.page}>
+      {/* Encabezado principal */}
+      <div className={s.headerRow}>
+        <h1 className={s.title}>Gestión de cursos</h1>
+        <p className={s.description}>
+          Los cursos se cargan automáticamente. Puedes ver inscritos y desinscribir sin
+          buscar email. Para inscribir, primero busca el usuario por email.
+        </p>
+      </div>
 
       {/* Panel de búsqueda de usuario (solo para inscribir) */}
-      <section className="mt-6 border rounded-lg p-4">
+      <section className={s.card}>
         <h2 className="font-medium mb-2">Buscar usuario para inscribir</h2>
         <form onSubmit={handleFindUser} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
@@ -353,7 +407,7 @@ export default function Courses() {
               className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="submit"
               disabled={findingUser}
@@ -374,19 +428,23 @@ export default function Courses() {
               Limpiar selección de usuario
             </button>
             <span className="text-sm text-gray-700">
-              {userId ? `Usuario seleccionado (id=${userId})` : "Sin usuario seleccionado"}
+              {userId
+                ? `Usuario seleccionado (id=${userId})`
+                : "Sin usuario seleccionado"}
             </span>
           </div>
         </form>
 
         {error && <div className="mt-3 text-red-600 text-sm">{error}</div>}
         {message && <div className="mt-3 text-green-700 text-sm">{message}</div>}
-        {successEnrollMsg && <div className="mt-3 text-green-700 text-sm">{successEnrollMsg}</div>}
+        {successEnrollMsg && (
+          <div className="mt-3 text-green-700 text-sm">{successEnrollMsg}</div>
+        )}
       </section>
 
       {/* Cursos siempre visibles */}
-      <section className="mt-6">
-        <div className="flex items-center justify-between mb-2">
+      <section className={s.card}>
+        <div className={s.cardHeaderRow}>
           <h2 className="font-medium">Cursos</h2>
           <button
             type="button"
@@ -398,50 +456,85 @@ export default function Courses() {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Capacidad</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Nombre</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Capacidad Parcial (Disponible)</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Precio</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Tipo</th>
-                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">Acciones</th>
+        <div className={s.tableWrapper}>
+          <table className="min-w-full text-sm border-separate border-spacing-0">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Capacidad
+                </th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Nombre
+                </th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Capacidad parcial (Disponible)
+                </th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Precio
+                </th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Tipo
+                </th>
+                <th className="px-3 py-2 text-left font-medium border-b border-gray-200">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               {!courses || courses.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 py-4 text-center text-gray-600">
-                    {loadingCourses ? "Cargando cursos…" : "Sin cursos disponibles"}
+                  <td
+                    colSpan={6}
+                    className="px-3 py-4 text-center text-gray-600"
+                  >
+                    {loadingCourses
+                      ? "Cargando cursos…"
+                      : "Sin cursos disponibles"}
                   </td>
                 </tr>
               ) : (
                 courses.map((c, i) => {
                   const left = seatsLeft(c);
-                  const full = typeof left === "number" ? left <= 0 : false;
+                  const full =
+                    typeof left === "number" ? left <= 0 : false;
                   const rowId = c.id ?? c.name ?? i;
-                  const isOpen = String(expandedCourseId) === String(rowId);
+                  const isOpen =
+                    String(expandedCourseId) === String(rowId);
                   const users = usersByCourse[rowId as any];
 
                   return (
                     <React.Fragment key={rowId}>
                       <tr className="even:bg-gray-50/50">
-                        <td className="px-3 py-2 border-b border-gray-100">{c.capacity}</td>
-                        <td className="px-3 py-2 border-b border-gray-100">{c.name}</td>
+                        <td className="px-3 py-2 border-b border-gray-100">
+                          {c.capacity}
+                        </td>
+                        <td className="px-3 py-2 border-b border-gray-100">
+                          {c.name}
+                        </td>
                         <td className="px-3 py-2 border-b border-gray-100">
                           {c.parcialCapacity}
-                          {typeof left === "number" && ` (${left} cupos)`}
+                          {typeof left === "number" &&
+                            ` (${left} cupos)`}
                         </td>
-                        <td className="px-3 py-2 border-b border-gray-100">{formatCOP(Number(c.price))}</td>
-                        <td className="px-3 py-2 border-b border-gray-100">{c.type}</td>
+                        <td className="px-3 py-2 border-b border-gray-100">
+                          {formatCOP(Number(c.price))}
+                        </td>
+                        <td className="px-3 py-2 border-b border-gray-100">
+                          {c.type}
+                        </td>
                         <td className="px-3 py-2 border-b border-gray-100">
                           <div className="flex gap-2 flex-wrap">
                             <button
                               type="button"
-                              disabled={full || enrollingId === rowId || userId == null || c.id == null}
-                              onClick={() => handleEnroll(c.id!, c.name)}
+                              disabled={
+                                full ||
+                                enrollingId === rowId ||
+                                userId == null ||
+                                c.id == null
+                              }
+                              onClick={() =>
+                                handleEnroll(c.id!, c.name)
+                              }
                               className="rounded bg-emerald-600 text-white px-3 py-1.5 disabled:opacity-50"
                               title={
                                 userId == null
@@ -453,12 +546,20 @@ export default function Courses() {
                                   : "Inscribir usuario"
                               }
                             >
-                              {enrollingId === rowId ? "Inscribiendo…" : userId == null ? "Inscribir (elige usuario)" : full ? "Sin cupos" : "Inscribir"}
+                              {enrollingId === rowId
+                                ? "Inscribiendo…"
+                                : userId == null
+                                ? "Inscribir (elige usuario)"
+                                : full
+                                ? "Sin cupos"
+                                : "Inscribir"}
                             </button>
 
                             <button
                               type="button"
-                              onClick={() => toggleCourseUsers(rowId as any)}
+                              onClick={() =>
+                                toggleCourseUsers(rowId as any)
+                              }
                               className="rounded bg-slate-600 text-white px-3 py-1.5"
                               title="Ver inscritos del curso"
                             >
@@ -474,35 +575,61 @@ export default function Courses() {
 
                       {isOpen && (
                         <tr>
-                          <td colSpan={6} className="px-3 py-3 bg-slate-50 border-b border-gray-200">
+                          <td
+                            colSpan={6}
+                            className="px-3 py-3 bg-slate-50 border-b border-gray-200"
+                          >
                             {loadingUsersCourseId === rowId ? (
-                              <div className="text-sm text-gray-600">Cargando inscritos…</div>
+                              <div className="text-sm text-gray-600">
+                                Cargando inscritos…
+                              </div>
                             ) : users && users.length > 0 ? (
-                              <div className="overflow-x-auto">
-                                <table className="min-w-full border border-gray-200 text-xs">
+                              <div className={s.innerTableWrapper}>
+                                <table className="min-w-full text-xs border-separate border-spacing-0">
                                   <thead>
                                     <tr className="bg-white">
-                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">Usuario</th>
-                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">Email</th>
-                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">Acciones</th>
+                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">
+                                        Usuario
+                                      </th>
+                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">
+                                        Email
+                                      </th>
+                                      <th className="px-2 py-2 text-left font-medium border-b border-gray-200">
+                                        Acciones
+                                      </th>
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {users.map((u) => {
                                       const key = `${rowId}:${u.id}`;
-                                      const isUnrolling = unrollingKey === key;
+                                      const isUnrolling =
+                                        unrollingKey === key;
                                       return (
-                                        <tr key={key} className="even:bg-gray-50/60">
-                                          <td className="px-2 py-2 border-b border-gray-100">{u.name}</td>
-                                          <td className="px-2 py-2 border-b border-gray-100">{u.email ?? "—"}</td>
+                                        <tr
+                                          key={key}
+                                          className="even:bg-gray-50/60"
+                                        >
+                                          <td className="px-2 py-2 border-b border-gray-100">
+                                            {u.name}
+                                          </td>
+                                          <td className="px-2 py-2 border-b border-gray-100">
+                                            {u.email ?? "—"}
+                                          </td>
                                           <td className="px-2 py-2 border-b border-gray-100">
                                             <button
                                               type="button"
-                                              onClick={() => handleUnroll(rowId as any, u.id)}
+                                              onClick={() =>
+                                                handleUnroll(
+                                                  rowId as any,
+                                                  u.id
+                                                )
+                                              }
                                               disabled={isUnrolling}
                                               className="rounded bg-rose-600 text-white px-2.5 py-1.5 disabled:opacity-50"
                                             >
-                                              {isUnrolling ? "Desinscribiendo…" : "Desinscribir"}
+                                              {isUnrolling
+                                                ? "Desinscribiendo…"
+                                                : "Desinscribir"}
                                             </button>
                                           </td>
                                         </tr>
@@ -512,7 +639,9 @@ export default function Courses() {
                                 </table>
                               </div>
                             ) : (
-                              <div className="text-sm text-gray-600">Este curso no tiene inscritos.</div>
+                              <div className="text-sm text-gray-600">
+                                Este curso no tiene inscritos.
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -525,6 +654,6 @@ export default function Courses() {
           </table>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

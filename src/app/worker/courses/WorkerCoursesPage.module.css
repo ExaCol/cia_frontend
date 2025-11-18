@@ -1,0 +1,65 @@
+.page {
+  max-width: 960px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Encabezado principal */
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.description {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Tarjeta genérica */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+/* Header dentro de la tarjeta de cursos (título + botón refrescar) */
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Wrapper de la tabla de cursos */
+.tableWrapper {
+  margin-top: 4px;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Tabla de inscritos dentro de cada curso */
+.innerTableWrapper {
+  margin-top: 4px;
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .page {
+    margin-top: 16px;
+  }
+}

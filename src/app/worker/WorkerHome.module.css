@@ -1,0 +1,38 @@
+.page {
+  max-width: 960px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Cada bloque (título + imagen) */
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+}
+
+/* En pantallas pequeñas, una columna */
+@media (max-width: 768px) {
+  .section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* Contenedor de la imagen (sustituye los inline styles) */
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 4 / 3;
+  margin: 0 auto;
+}
