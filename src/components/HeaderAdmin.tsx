@@ -1,12 +1,13 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.0
+Version 1.1
 Header Admin Component
 */
 
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import s from "./Header.module.css";
@@ -16,7 +17,7 @@ const nav = [
   { href: "/admin/courses", label: "Cursos" },
   { href: "/admin/register", label: "Usuarios" },
   { href: "/admin/partners", label: "Aliados" },
-  { href: "/admin/profile", label: "Perfil" }
+  { href: "/admin/profile", label: "Perfil" },
 ];
 
 export default function Header() {
@@ -26,11 +27,13 @@ export default function Header() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
   const norm = (p: string) => p.replace(/\/$/, "") || "/";
   const isActive = (href: string) =>
     norm(href) === "/"
@@ -40,8 +43,14 @@ export default function Header() {
   return (
     <header className={s.header}>
       <div className={`container ${s.row}`}>
-        <Link href="/" className={s.logo}>
-          SmartTraffic
+        {/* Logo igual que en client/worker pero apuntando a /admin */}
+        <Link href="/admin" className={s.logo}>
+          <Image
+            src="/smarttraffic-logo.png"
+            alt="SmartTraffic"
+            width={72} 
+            height={72}
+          />
         </Link>
 
         <nav className={s.desktopNav} aria-label="Principal">
@@ -62,7 +71,7 @@ export default function Header() {
           aria-label="Abrir menú"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          onClick={() => setOpen(v => !v)}
+          onClick={() => setOpen((v) => !v)}
         >
           <span className={s.bar} />
           <span className={s.bar} />
@@ -85,7 +94,6 @@ export default function Header() {
           </Link>
         ))}
       </nav>
-      <hr></hr>
     </header>
   );
 }
