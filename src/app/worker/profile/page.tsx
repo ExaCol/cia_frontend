@@ -1,26 +1,23 @@
 /*
 Developed by Tomás Vera & Luis Romero
-Version 1.0
-Profile Page
+Version 1.1
+Worker Profile Page
 */
 
 "use client";
 
 import React from "react";
 import axios from "axios";
-import Link from "next/link";
 import Profile from "@/components/Profile";
+import s from "./WorkerProfilePage.module.css";
 
-
-function profile() {
+function WorkerProfilePage() {
   const eliminarCuenta = async () => {
-    //Alerta de confirmacion si / no para eliminar cuenta
     if (
       confirm(
         "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer."
       )
     ) {
-      //Obtener jwt
       axios
         .get("/api/auth/token")
         .then(async (response: any) => {
@@ -46,24 +43,23 @@ function profile() {
               alert(
                 "Error al obtener el token. Por favor, intenta nuevamente."
               );
-              return;
             });
         })
         .catch((error: any) => {
           console.error("Error al obtener el token:", error);
           alert("Error al obtener el token. Por favor, intenta nuevamente.");
-          return;
         });
     }
   };
 
-  const cerrarSesion = async (cuentaEliminada : boolean) => {
-    if(!cuentaEliminada){
+  const cerrarSesion = async (cuentaEliminada: boolean) => {
+    if (!cuentaEliminada) {
       if (!confirm("¿Estás seguro de que deseas cerrar sesión?")) {
         return;
       }
     }
-      axios
+
+    axios
       .post("/api/auth/logout")
       .then(() => {
         alert("Sesión cerrada exitosamente.");
@@ -73,16 +69,48 @@ function profile() {
         console.error("Error al cerrar sesión:", error);
         window.location.href = "/";
       });
-    };
+  };
 
   return (
-    <div>
-      <h1 style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>Perfil de usuario</h1>
-      <Profile role = "worker"/>
-      <button onClick={eliminarCuenta}>Eliminar Cuenta</button>
-      <button onClick={() => cerrarSesion(false)}>Cerrar Sesión</button>
+    <div className={s.page}>
+      <h1 className={s.title}>Perfil de empleado</h1>
+
+      <div className={s.layout}>
+        {/* Card principal con el perfil */}
+        <section className={s.card}>
+          <div className={s.profileWrapper}>
+            <Profile role="worker" />
+          </div>
+        </section>
+
+        {/* Card de seguridad de la cuenta */}
+        <section className={s.card}>
+          <h2 className={s.cardTitle}>Seguridad de la cuenta</h2>
+          <p className={s.cardText}>
+            Desde aquí puedes cerrar sesión o eliminar tu cuenta de empleado.
+          </p>
+
+          <div className={s.actions}>
+            <button
+              type="button"
+              className={s.dangerButton}
+              onClick={() => cerrarSesion(false)}
+            >
+              Cerrar sesión
+            </button>
+
+            <button
+              type="button"
+              className={s.dangerButton}
+              onClick={eliminarCuenta}
+            >
+              Eliminar cuenta
+            </button>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
 
-export default profile;
+export default WorkerProfilePage;

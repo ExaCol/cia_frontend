@@ -1,0 +1,46 @@
+.page {
+  max-width: 960px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Encabezado */
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Tarjeta que envuelve la tabla / contenido de Courses */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+/* Wrapper por si Courses mete algo ancho (tablas) */
+.coursesWrapper {
+  margin-top: 4px;
+  overflow-x: auto;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .page {
+    margin-top: 16px;
+  }
+}

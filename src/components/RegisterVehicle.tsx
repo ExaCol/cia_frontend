@@ -19,21 +19,76 @@ function RegisterVehicle() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
 
-    // Recolectar datos
-    const plate = String(fd.get("plate") ?? "").trim();
     const soatRateType = String(fd.get("soatRateType") ?? "").trim();
+
+    const validSoatRates = [
+      "100",
+      "110",
+      "120",
+      "130",
+      "140",
+      "150",
+      "211",
+      "212",
+      "221",
+      "222",
+      "231",
+      "232",
+      "310",
+      "320",
+      "330",
+      "410",
+      "420",
+      "430",
+      "511",
+      "512",
+      "521",
+      "522",
+      "531",
+      "532",
+      "611",
+      "612",
+      "621",
+      "622",
+      "711",
+      "712",
+      "721",
+      "722",
+      "731",
+      "732",
+      "810",
+      "910",
+      "920",
+    ];
+
+    if (!validSoatRates.includes(soatRateType)) {
+      alert(
+        `El tipo de tarifa SOAT "${soatRateType}" no es válido. Debe ser uno de: ${validSoatRates.join(
+          ", "
+        )}`
+      );
+      return;
+    }
+
+    //validar placa
+    const plate = String(fd.get("plate") ?? "").trim();
+    if(!/^[A-Z]{3}\d{3}$/.test(plate)){
+      alert("La placa debe tener el formato ABC123 (3 letras mayúsculas seguidas de 3 números).");
+      return;
+    }
+
+    // Recolectar datos
     const type = String(fd.get("type") ?? "").trim();
-    const technoClassification = String(
-      fd.get("technoClassification") ?? ""
-    ).trim();
+    const model = String(fd.get("model") ?? "").trim();
     const soatExpiration = String(fd.get("soatExpiration") ?? "").trim();
     const technoExpiration = String(fd.get("technoExpiration") ?? "").trim();
+
 
     const payload = {
       plate,
       soatRateType,
       type,
-      technoClassification,
+      model,
       soatExpiration,
       technoExpiration,
     };
@@ -51,11 +106,11 @@ function RegisterVehicle() {
           })
           .then((res) => {
             alert("Vehículo registrado exitosamente");
-            router.push("/");
+            router.push("/client/profile");
           })
           .catch((err) => {
             console.error("Error al registrar el vehículo:", err);
-            alert("Error al registrar el vehículo: "  + err.response.data);
+            alert("Error al registrar el vehículo: " + err.response.data);
           });
       })
       .catch((err) => {
@@ -100,27 +155,26 @@ function RegisterVehicle() {
 
       <label htmlFor="type">Tipo</label>
       <select id="type" name="type" defaultValue="Automovil" required>
-        <option value="Automovil">Automóvil</option>
-        <option value="Bus">Bus</option>
-        <option value="Buseta">Buseta</option>
-        <option value="Camion">Camión</option>
-        <option value="Camioneta">Camioneta</option>
-        <option value="Campero">Campero</option>
-        <option value="Microbus">Microbus</option>
-        <option value="Tractocamion">Tractocamión</option>
-        <option value="Motocicleta">Motocicleta</option>
-        <option value="Motocarro">Motocarro</option>
-        <option value="Mototriciclo">Mototriciclo</option>
-        <option value="Cuatriomoto">Cuatriomoto</option>
-        <option value="Volqueta">Volqueta</option>
+        <option value="Motos">Moto</option>
+        <option value="Liviano Particular">Liviano Particular</option>
+        <option value="Liviano Publico">Liviano Público</option>
+        <option value="Pesado Particular">Pesado Particular</option>
+        <option value="Pesado Publico">Pesado Público</option>
       </select>
 
-      <label htmlFor="technoClassification">Clasificación Tecnomecánica </label>
-      <select id="technoClassification" name="technoClassification" defaultValue="Particular" required>
-        <option value="Particular">Particular</option>
-        <option value="Publico">Público</option>
-        <option value="Comercial">Comercial</option>
-      </select>
+      <label htmlFor="model">Modelo (año)</label>
+      <input
+        id="model"
+        name="model"
+        type="number"
+        inputMode="numeric"
+        placeholder="Ej: 2011"
+        min={2008}
+        max={new Date().getFullYear()}
+        step={1}
+        required
+        pattern="\d{4}"
+      />
 
       <label htmlFor="soatExpiration">Vencimiento del SOAT</label>
       <input id="soatExpiration" name="soatExpiration" type="date" required />

@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="container">
         <div className={s.brand}>
         <a href="https://exacol.github.io/ExaPages/" target="_blank" rel="noopener noreferrer" className={s.logoLink} arial-label="Exa">
-          <Image src="/ExaBlack.png" alt="Exa" width={60} height={28}/>
+          <Image src="/ExaBlack.png" alt="Exa" width={60} height={38}/>
         </a>
         </div>
         <div className={s.bottom}>

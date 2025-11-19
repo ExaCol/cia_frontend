@@ -67,8 +67,14 @@ function UpdatePassword() {
       });
   };
   return (
-    <div>
-      <h1>Actualizar Contraseña</h1>
+    <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "10px",
+          marginBottom: "20px",
+        }}>
+      
       <form
         onSubmit={handleSubmit}
         style={{
@@ -81,8 +87,7 @@ function UpdatePassword() {
           textAlign: "left",
         }}
       >
-        <h2 style={{ margin: 0, alignSelf: "center" }}>Iniciar sesión</h2>
-
+        <h1>Actualizar Contraseña</h1>
         <label htmlFor="pass">Contraseña Actual</label>
         <input
           id="pass"

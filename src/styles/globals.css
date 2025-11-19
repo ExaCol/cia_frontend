@@ -28,7 +28,25 @@
   font-family: var(--font-family-base);
 }
 
+
+html,
 body {
+  height: 100%;
+}
+
+.layout {
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+}
+
+
+body {
+  margin: 0; /* 👈 esto es lo que falta */
   background-color: var(--color-white);
   color: var(--color-black);
   font-size: var(--font-size-base);

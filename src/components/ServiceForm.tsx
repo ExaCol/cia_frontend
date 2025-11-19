@@ -5,75 +5,97 @@ Service Create Form (Cliente)
 */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import "@/styles/globals.css";
 
-const url = process.env.NEXT_PUBLIC_URL;
-
-type ServicePayload = {
-  serviceType: string;
-  plate?: string;
-  exp_date?: string; // yyyy-mm-dd
-  assurance?: string;
-  duration?: string;
-  graduated?: boolean;
-  notes?: string;
+type Vehicle = {
+  id: number;
+  type: string;
+  plate: string;
+  soatRateType: string;
+  model: number;
+  soatExpiration: string;
+  technoExpiration: string;
 };
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_URL,
+  timeout: 10000,
+});
 
 export default function ServiceForm() {
   const router = useRouter();
-  const [data, setData] = useState<ServicePayload>({
-    serviceType: "",
-    plate: "",
-    exp_date: "",
-    assurance: "",
-    duration: "",
-    graduated: false,
-    notes: "",
-  });
-  const [loading, setLoading] = useState(false);
+  const [pass, setPass] = useState(true);
+  const [plates, setPlates] = useState<string[]>([]);
+  const [serviceType, setServiceType] = useState<string>("");
 
-  const onChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value, type, checked } = e.target as any;
-    setData((d) => ({ ...d, [name]: type === "checkbox" ? checked : value }));
-  };
+  useEffect(() => {
+    let mounted = true;
 
-  const onSubmit = async (e: React.FormEvent) => {
+    (async () => {
+      try {
+        const { data: jwt } = await axios.get("/api/auth/token");
+        if (!jwt) throw new Error("No se obtuvo token");
+
+        const resp = await api.get<Vehicle[] | Vehicle>("/vehicle/vehicles", {
+          headers: { Authorization: `Bearer ${jwt}` },
+        });
+
+        const data = resp.data;
+        const list = Array.isArray(data) ? data : [data];
+        const onlyPlates = [
+          ...new Set(list.map((v) => v.plate).filter(Boolean)),
+        ];
+        setPass(true);
+        if (mounted) setPlates(onlyPlates);
+      } catch (e: any) {
+        if (e.response.status == 401) {
+          axios
+            .post("/api/auth/logout")
+            .finally(() => (window.location.href = "/"));
+          return;
+        }
+
+        // Cualquier otro error -> mensaje por defecto
+        if (mounted) {
+          setPass(false);
+          setPlates([
+            "No tienes vehiculos registrados, registra vehículos en el perfil",
+          ]);
+        }
+        console.error("Error obteniendo vehículos:", e);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    const fd = new FormData(e.currentTarget);
 
-    try {
-      const tRes = await axios.get("/api/auth/token", {
-        withCredentials: true,
-      });
-      const jwt = tRes.data;
-      const payload: Record<string, any> = { ...data };
-      Object.keys(payload).forEach(
-        (k) => payload[k] === "" && delete payload[k]
-      );
-      await axios.post(url + "/services/create", payload, {
-        headers: { Authorization: `Bearer ${jwt}` },
-      });
+    const plate = String(fd.get("plate") ?? "").trim();
+    const serviceType = String(fd.get("serviceType") ?? "").trim();
+    const courseType = String(fd.get("courseType") ?? "").trim();
 
-      alert("Servicio guardado exitosamente");
-      router.replace("/client/services");
-    } catch (err: any) {
-      console.error(
-        "Error al crear servicio:",
-        err?.response?.data || err.message
+    if (serviceType === "COURSE") {
+      router.push(
+        `/client/services/oficinas-tramites?serviceType=${serviceType}&courseType=${courseType}`
       );
-      alert(
-        "Error al registrar servicio: " + (err?.response?.data || err.message)
-      );
-    } finally {
-      setLoading(false);
+    }else if( serviceType === "SOAT" || serviceType === "TECNO"){
+      if (!pass) {
+      alert("No puedes solicitar este servicio sin la placa del vehículo");
+      return;
     }
+      router.push(
+        `/client/services/oficinas-tramites?serviceType=${serviceType}&plate=${plate}`
+      );
+    }
+    
   };
 
   return (
@@ -90,82 +112,55 @@ export default function ServiceForm() {
       <h2 style={{ textAlign: "center", marginBottom: 8 }}>
         Solicitar Servicio
       </h2>
-
-      <label htmlFor="serviceType">Tipo de Servicio*</label>
+      <label htmlFor="serviceType">Tipo de Servicio</label>
       <select
         id="serviceType"
         name="serviceType"
+        value={serviceType}
+        onChange={(e) => setServiceType(e.target.value)}
         required
-        value={data.serviceType}
-        onChange={onChange}
       >
         <option value="" disabled>
           Selecciona…
         </option>
+        <option value="COURSE">Curso de Conducción</option>
         <option value="SOAT">SOAT</option>
-        <option value="Tecnomecanica">Tecnomecánica</option>
-        <option value="CursoConduccion">Curso de Conducción</option>
-        <option value="Otro">Otro</option>
+        <option value="TECNO">Tecnomecánica</option>
       </select>
 
-      <label htmlFor="plate">Placa (si aplica)</label>
-      <input
-        id="plate"
-        name="plate"
-        placeholder="ABC123"
-        value={data.plate}
-        onChange={onChange}
-      />
+      {serviceType != "COURSE" && (
+        <>
+          <label htmlFor="plate">Placa</label>
+          <select id="plate" name="plate" required>
+            {plates.map((y: any) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
-      <label htmlFor="exp_date">Fecha de expiración (si aplica)</label>
-      <input
-        id="exp_date"
-        name="exp_date"
-        type="date"
-        value={data.exp_date}
-        onChange={onChange}
-      />
-
-      <label htmlFor="assurance">Aseguradora (si aplica)</label>
-      <input
-        id="assurance"
-        name="assurance"
-        placeholder="SURA, AXA..."
-        value={data.assurance}
-        onChange={onChange}
-      />
-
-      <label htmlFor="duration">Duración (si aplica)</label>
-      <input
-        id="duration"
-        name="duration"
-        placeholder="1 año, 6 meses..."
-        value={data.duration}
-        onChange={onChange}
-      />
-
-      <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <input
-          type="checkbox"
-          name="graduated"
-          checked={data.graduated}
-          onChange={onChange}
-        />
-        ¿Graduado (si aplica)?
-      </label>
-
-      <label htmlFor="notes">Notas</label>
-      <textarea
-        id="notes"
-        name="notes"
-        placeholder="Detalles adicionales…"
-        value={data.notes}
-        onChange={onChange}
-      />
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Guardando…" : "Registrar servicio"}
-      </button>
+      {serviceType == "COURSE" && (
+        <>
+          <label htmlFor="courseType">Tipo de Curso</label>
+          <select id="courseType" name="courseType" required>
+            <option value="" disabled>
+              Selecciona…
+            </option>
+            <option value="A1">Curso de Conducción A1</option>
+            <option value="A2">Curso de Conducción A2</option>
+            <option value="B1">Curso de Conducción B1</option>
+            <option value="B2">Curso de Conducción B2</option>
+            <option value="B3">Curso de Conducción B3</option>
+            <option value="C1">Curso de Conducción C1</option>
+            <option value="C2">Curso de Conducción C2</option>
+            <option value="C3">Curso de Conducción C3</option>
+            <option value="COMPARENDO">Curso de Comparendo</option>
+          </select>
+        </>
+      )}
+      <button type="submit">Buscar Oficinas y tramitar servicio</button>
     </form>
   );
 }
